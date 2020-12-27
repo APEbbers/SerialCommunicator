@@ -1,0 +1,4 @@
+include README.md
+recursive-include SerialCommunicator/templates *
+recursive-include SerialCommunicator/translations *
+recursive-include SerialCommunicator/static *
