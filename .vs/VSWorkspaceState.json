@@ -1,0 +1,10 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\SerialCommunicator",
+    "\\SerialCommunicator\\static",
+    "\\SerialCommunicator\\templates"
+  ],
+  "SelectedNode": "\\SerialCommunicator\\templates\\SerialCommunicator_tab.jinja2",
+  "PreviewInSolutionExplorer": false
+}
