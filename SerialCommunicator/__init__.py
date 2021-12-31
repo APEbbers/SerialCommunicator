@@ -1,79 +1,123 @@
 # coding=utf-8
-from __future__ import absolute_import
-
-### (Don't forget to remove me)
-# This is a basic skeleton for your plugin's __init__.py. You probably want to adjust the class name of your plugin
-# as well as the plugin mixins it's subclassing from. This is really just a basic skeleton to get you started,
-# defining your plugin as a template plugin, settings and asset plugin. Feel free to add or remove mixins
-# as necessary.
-#
-# Take a look at the documentation on what other plugin mixins are available.
+from __future__ import absolute_import, unicode_literals
 
 import octoprint.plugin
+import serial
+import usb.core
+import usb.backend.libusb1
 
-class SerialcommunicatorPlugin(octoprint.plugin.SettingsPlugin,
-                               octoprint.plugin.AssetPlugin,
-                               octoprint.plugin.TemplatePlugin):
+class SerialcommunicatorPlugin(
+                                octoprint.plugin.StartupPlugin,
+                                octoprint.plugin.TemplatePlugin,
+                                octoprint.plugin.SettingsPlugin):
 
-	##~~ SettingsPlugin mixin
+    def on_after_startup(self):
+        self._logger.info("SerialCommunicator")
 
-	def get_settings_defaults(self):
-		return dict(
-			# put your plugin's default settings here
-		)
+    def get_settings_defaults(self):
+        return dict(
+            selectedPort="",
+            selectedBaudrate="",
+            Command1="",
+            # selectedPort2={"USB1", "USB2", "USB3", "USB4"},
+            selectedPort2="",
+            )
 
-	##~~ AssetPlugin mixin
+    def get_template_configs(self):
+        return [
+                dict(type="settings", custom_bindings=False)
+                ]
 
-	def get_assets(self):
-		# Define your plugin's asset files to automatically include in the
-		# core UI here.
-		return dict(
-			js=["js/SerialCommunicator.js"],
-			css=["css/SerialCommunicator.css"],
-			less=["less/SerialCommunicator.less"]
-		)
+    # def get_assets(self):
+    #     self._logger.info("Get javascript knockout")
+    #     return dict(
+    #         js=["js/SerialCommunicator.js"]
+    #     )
 
-	##~~ Softwareupdate hook
+    # def get_template_vars(self):
+    #     return dict(selectedPort2=self._settings.get(["selectedPort2"]))
 
-	def get_update_information(self):
-		# Define the configuration for your plugin to use with the Software Update
-		# Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
-		# for details.
-		return dict(
-			SerialCommunicator=dict(
-				displayName="Serialcommunicator Plugin",
-				displayVersion=self._plugin_version,
+    def get_template_vars(self):
+        import re
+        import subprocess
+        device_re = re.compile(b"Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
+        df = subprocess.check_output("lsusb")
+        devices = []
+        for i in df.split(b'\n'):
+            if i:
+                info = device_re.match(i)
+                if info:
+                    dinfo = info.groupdict()
+                    dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
+                    devices.append(dinfo)                    
+        print(devices)           
+        objItems=devices
+        self._logger.debug("In CreateList")
+        # objItems = {
+        #             'Blue',
+        #             'Red',
+        #             'White',
+        #             'Green',
+        #             'Black',
+        #             'Orange',
+        #     }
+        return dict(selectedPort2=objItems)
 
-				# version check: github repository
-				type="github_release",
-				user="APEbbers",
-				repo="SerialCommunicator",
-				current=self._plugin_version,
+    def on_settings_save(self, data):
+        octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
-				# update method: pip
-				pip="https://github.com/APEbbers/SerialCommunicator/archive/{target_version}.zip"
-			)
-		)
+    def HandleM150(
+                    self, comm_instance, phase, cmd, cmd_type, gcode,
+                    *args, **kwargs):
+        c = self._settings.get(["Command1"])
+
+        if cmd == c:
+            self._logger.debug(f"{c} Detected!")
+            ser = serial.Serial(self._settings.get(["selectedPort"]))
+            ser.baudrate = int(self._settings.get(["selectedBaudrate"]))
+            ser.timeout = 10
+            ser.write(bytes(self._settings.get(["Command1"]), 'utf-8'))
+            # ser.close()
+
+    def get_update_information(self):
+        # Define the configuration for your plugin to use with the Software Update
+        # Plugin here. See:
+        #  https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
+        # for details.
+        return dict(
+            SerialCommunicator=dict(
+                displayName="Serialcommunicator Plugin",
+                displayVersion=self._plugin_version,
+
+                # version check: github repository
+                type="github_release",
+                user="APEbbers",
+                repo="SerialCommunicator",
+                current=self._plugin_version,
+
+                # update method: pip
+                pip="https://github.com/APEbbers/SerialCommunicator/archive/, \
+                {target_version}.zip"
+            )
+        )
 
 
-# If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
-# ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
-# can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
 __plugin_name__ = "Serialcommunicator Plugin"
 
-# Starting with OctoPrint 1.4.0 OctoPrint will also support to run under Python 3 in addition to the deprecated
-# Python 2. New plugins should make sure to run under both versions for now. Uncomment one of the following
-# compatibility flags according to what Python versions your plugin supports!
-#__plugin_pythoncompat__ = ">=2.7,<3" # only python 2
-#__plugin_pythoncompat__ = ">=3,<4" # only python 3
-__plugin_pythoncompat__ = ">=2.7,<4" # python 2 and 3
+
+# __plugin_pythoncompat__ = ">=2.7,<3"  # only python 2
+# __plugin_pythoncompat__ = ">=3,<4"  # only python 3
+__plugin_pythoncompat__ = ">=2.7,<4"  # python 2 and 3
+
 
 def __plugin_load__():
-	global __plugin_implementation__
-	__plugin_implementation__ = SerialcommunicatorPlugin()
+    global __plugin_implementation__
+    __plugin_implementation__ = SerialcommunicatorPlugin()
 
-	global __plugin_hooks__
-	__plugin_hooks__ = {
-		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
-	}
-
+    global __plugin_hooks__
+    __plugin_hooks__ = {
+        "octoprint.plugin.softwareupdate.check_config":
+        __plugin_implementation__.get_update_information,
+        "octoprint.comm.protocol.gcode.queuing":
+        __plugin_implementation__.HandleM150,
+    }
