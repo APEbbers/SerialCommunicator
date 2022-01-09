@@ -1,26 +1,256 @@
 <form class="form-horizontal">
-    <div id="controlGroup1" class="control-group">
-        <label class="">Serial Port</label>
-        <select id="selectedPort" class="custom-select" style="width:600px" data-bind="value: settings.plugins.SerialCommunicator.selectedPort">
-            {% for x in plugin_SerialCommunicator_selectedPort %}
-                {% set List1 = x.split('#') %} 
-                <option value="{{List1[2]}}">{{List1[0]}} - {{List1[1]}} - {{List1[2]}}</option>
-            {% endfor %}
-        </select>
-        <label class="">Baudrate</label>
-        <select id="connection_baudrates_SC" class="select-mini" data-bind="value: settings.plugins.SerialCommunicator.selectedBaudrate">
-            <option value="250000">250000</option>
-            <option value="230400">230400</option>
-            <option value="115200">115200</option>
-            <option value="57600">57600</option>
-            <option value="38400">38400</option>
-            <option value="19200">19200</option>
-            <option value="9600">9600</option>
-            <option value=""></option>
-        </select>
-        <div class="control-group">
-            <label class="">Commands</label>
-            <input id="Command1" type="text" class="input-mini text-left" style="width:600px" data-bind="value: settings.plugins.SerialCommunicator.Command1">
+    <div class="custom_container">
+        <ul class="nav nav-pills">
+            <li class="active"><a data-toggle="pill" href="#serial_connection">Connection</a></li>
+            <li><a data-toggle="pill" href="#gcode_commands">Gcode commands</a></li>
+            <li><a data-toggle="pill" href="#action_commands">Action commands</a></li>
+            <li><a data-toggle="pill" href="#events">Events</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="serial_connection" class="tab-pane in active">
+                <h5>Serial Port</h5>
+                <select id="selectedPort" class="custom_checkbox-select" style="width:100%;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedPort">
+                    {% for x in plugin_SerialCommunicator_selectedPort %}
+                        {% set List1 = x.split('#') %} 
+                        <option value="{{List1[2]}}">{{List1[0]}} - {{List1[1]}} - {{List1[2]}}</option>
+                    {% endfor %}
+                </select>
+                <h5>Baudrate</h5>
+                <select id="connection_baudrates_SC" class="custom_checkbox-select" style="width:100px;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedBaudrate">
+                    <option value="250000">250000</option>
+                    <option value="230400">230400</option>
+                    <option value="115200">115200</option>
+                    <option value="57600">57600</option>
+                    <option value="38400">38400</option>
+                    <option value="19200">19200</option>
+                    <option value="9600">9600</option>
+                </select>
+            </div>
+            <div id="gcode_commands" class="tab-pane fade">                
+                <div><label class="">Separate commands with ";". (For example: M117;M500)</label></div>
+                <div><input id="gcode_commands" type="text" class="input-mini text-left" style="width:400px" data-bind="value: settings.plugins.SerialCommunicator.gcode.gcode_commands"></div>
+                <p><label><br>Click <a href="https://www.reprap.org/wiki/G-code" target="_blank">here</a> for more information about gcode commands.</label></p>
+            </div>
+            <div id="action_commands" class="tab-pane fade">                
+                <div class="table-responsive" style="width:600px">
+                    <table class="table table-striped table-bordered table-hover table-condensed mx-left w-auto">
+                        <thead>
+                            <tr>
+                                <th><b>Action</b></th>
+                                <th><b>Message</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <colgroup>
+                            <col span="0" style="width:100px", >
+                            <col span="1" style="width:525px" >
+                        </colgroup>
+                            <tr>
+                                <td><label>any</label></td>
+                                <td><input id="action_any_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_any"></td>
+                            </tr>
+                            <tr>
+                                <td><label>start</label></td>
+                                <td><input id="action_start_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_start"></td>
+                            </tr>
+                            <tr>
+                                <td><label>cancel</label></td>
+                                <td><input id="action_cancel_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_cancel"></td>
+                            </tr>
+                            <tr>
+                                <td><label>pause</label></td>
+                                <td><input id="action_pause_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_pause"></td>
+                            </tr>
+                            <tr>
+                                <td><label>paused</label></td>
+                                <td><input id="action_paused_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_paused"></td>
+                            </tr>
+                            <tr>
+                                <td><label>resume</label></td>
+                                <td><input id="action_resume_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_resume"></td>
+                            </tr>
+                            <tr>
+                                <td><label>resumed</label></td>
+                                <td><input id="action_resumed_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_resumed"></td>
+                            </tr>
+                            <tr>
+                                <td><label>disconnect</label></td>
+                                <td><input id="action_disconnect_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_disconnect"></td>
+                            </tr>
+                            <tr>
+                                <td><label>notification</label></td>
+                                <td><input id="action_notification_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_notification"></td>
+                            </tr>
+                            <tr>
+                                <td><label>sd_inserted</label></td>
+                                <td><input id="action_sd_inserted_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_sd_inserted"></td>
+                            </tr>
+                            <tr>
+                                <td><label>sd_ejected</label></td>
+                                <td><input id="action_sd_ejected_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_sd_ejected"></td>
+                            </tr>
+                            <tr>
+                                <td><label>sd_updated</label></td>
+                                <td><input id="action_sd_updated_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_sd_updated"></td>
+                            </tr>
+                        </tbody>
+                    </table>            
+                </div> 
+                <div><label>Click <a href="https://docs.octoprint.org/en/master/features/action_commands.html#sec-features-action-commands" target="_blank">here</a> for more information about action commands.</label></div>                          
+            </div>
+            <div id="events" class="tab-pane fade">
+                <div id="serial_connection" class="tab-pane in active">
+                    <div class="panel-group" id="accordion">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">Server</a>
+                                </ins>
+                            </div>
+                            <div id="collapse1" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Startup" data-bind="checked: settings.plugins.SerialCommunicator.events.Startup"><label for="Startup">Startup</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Shutdown" data-bind="checked: settings.plugins.SerialCommunicator.events.Shutdown"><label for="Shutdown">Shutdown</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="ClientOpened" data-bind="checked: settings.plugins.SerialCommunicator.events.ClientOpened"><label for="ClientOpened">ClientOpened</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="ClientAuthed" data-bind="checked: settings.plugins.SerialCommunicator.events.ClientAuthed"><label for="ClientAuthed">ClientAuthed</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="ClientClosed" data-bind="checked: settings.plugins.SerialCommunicator.events.ClientClosed"><label for="ClientClosed">ClientClosed</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="UserLoggedIn" data-bind="checked: settings.plugins.SerialCommunicator.events.UserLoggedIn"><label for="UserLoggedIn">UserLoggedIn</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="UserLoggedOut" data-bind="checked: settings.plugins.SerialCommunicator.events.UserLoggedOut"><label for="UserLoggedOut">UserLoggedOut</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="ConnectivityChanged" data-bind="checked: settings.plugins.SerialCommunicator.events.ConnectivityChanged"><label for="ConnectivityChanged">ConnectivityChanged</label></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Printer communication</a>
+                                </ins>
+                            </div>
+                            <div id="collapse2" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Connecting" data-bind="checked: settings.plugins.SerialCommunicator.events.Connecting"><label for="Connecting">Connecting</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Connected" data-bind="checked: settings.plugins.SerialCommunicator.events.Connected"><label for="Connected">Connected</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Disconnecting" data-bind="checked: settings.plugins.SerialCommunicator.events.Disconnecting"><label for="Disconnecting">Disconnecting</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Disconnected" data-bind="checked: settings.plugins.SerialCommunicator.events.Disconnected"><label for="Disconnected">Disconnected</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Error" data-bind="checked: settings.plugins.SerialCommunicator.events.Error"><label for="Error">Error</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrinterStateChanged" data-bind="checked: settings.plugins.SerialCommunicator.events.PrinterStateChanged"><label for="PrinterStateChanged">PrinterStateChanged</label></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">File handling</a>
+                                </ins>
+                            </div>
+                            <div id="collapse3" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Upload" data-bind="checked: settings.plugins.SerialCommunicator.events.Upload"><label for="Upload">Upload</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="FileAdded" data-bind="checked: settings.plugins.SerialCommunicator.events.FileAdded"><label for="FileAdded">FileAdded</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="FileRemoved" data-bind="checked: settings.plugins.SerialCommunicator.events.FileRemoved"><label for="FileRemoved">FileRemoved</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="FolderAdded" data-bind="checked: settings.plugins.SerialCommunicator.events.FolderAdded"><label for="FolderAdded">FolderAdded</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="FolderRemoved" data-bind="checked: settings.plugins.SerialCommunicator.events.FolderRemoved"><label for="FolderRemoved">FolderRemoved</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="UpdatedFiles" data-bind="checked: settings.plugins.SerialCommunicator.events.UpdatedFiles"><label for="UpdatedFiles">UpdatedFiles</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="MetadataAnalysisStarted" data-bind="checked: settings.plugins.SerialCommunicator.events.MetadataAnalysisStarted"><label for="MetadataAnalysisStarted">MetadataAnalysisStarted</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="MetadataAnalysisFinished" data-bind="checked: settings.plugins.SerialCommunicator.events.MetadataAnalysisFinished"><label for="MetadataAnalysisFinished">MetadataAnalysisFinished</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="FileSelected" data-bind="checked: settings.plugins.SerialCommunicator.events.FileSelected"><label for="FileSelected">FileSelected</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="FileDeselected" data-bind="checked: settings.plugins.SerialCommunicator.events.FileDeselected"><label for="FileDeselected">FileDeselected</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="TransferStarted" data-bind="checked: settings.plugins.SerialCommunicator.events.TransferStarted"><label for="TransferStarted">TransferStarted</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="TransferDone" data-bind="checked: settings.plugins.SerialCommunicator.events.TransferDone"><label for="TransferDone">TransferDone</label></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">Printing</a>
+                                </ins>
+                            </div>
+                            <div id="collapse4" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrintStarted" data-bind="checked: settings.plugins.SerialCommunicator.events.PrintStarted"><label for="PrintStarted">PrintStarted</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrintFailed" data-bind="checked: settings.plugins.SerialCommunicator.events.PrintFailed"><label for="PrintFailed">PrintFailed</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrintDone" data-bind="checked: settings.plugins.SerialCommunicator.events.PrintDone"><label for="PrintDone">PrintDone</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrintCancelling" data-bind="checked: settings.plugins.SerialCommunicator.events.PrintCancelling"><label for="PrintCancelling">PrintCancelling</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrintCancelled" data-bind="checked: settings.plugins.SerialCommunicator.events.PrintCancelled"><label for="PrintCancelled">PrintCancelled</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrintPaused" data-bind="checked: settings.plugins.SerialCommunicator.events.PrintPaused"><label for="PrintPaused">PrintPaused</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrintResumed" data-bind="checked: settings.plugins.SerialCommunicator.events.PrintResumed"><label for="PrintResumed">PrintResumed</label></div>
+                                {# <div class="checkbox"><input class="custom" type="checkbox" id="GcodeScript${ScriptName}Finished" data-bind="checked: settings.plugins.SerialCommunicator.events.GcodeScript${ScriptName}Finished"><label for="GcodeScript${ScriptName}Finished">GcodeScript${ScriptName}Finished</label></div> #}
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse5">GCODE processing</a>
+                                </ins>
+                            </div>
+                            <div id="collapse5" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PowerOn" data-bind="checked: settings.plugins.SerialCommunicator.events.PowerOn"><label for="PowerOn">PowerOn</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PowerOff" data-bind="checked: settings.plugins.SerialCommunicator.events.PowerOff"><label for="PowerOff">PowerOff</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Home" data-bind="checked: settings.plugins.SerialCommunicator.events.Home"><label for="Home">Home</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="ZChange" data-bind="checked: settings.plugins.SerialCommunicator.events.ZChange"><label for="ZChange">ZChange</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Dwell" data-bind="checked: settings.plugins.SerialCommunicator.events.Dwell"><label for="Dwell">Dwell</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Waiting" data-bind="checked: settings.plugins.SerialCommunicator.events.Waiting"><label for="Waiting">Waiting</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Cooling" data-bind="checked: settings.plugins.SerialCommunicator.events.Cooling"><label for="Cooling">Cooling</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Alert" data-bind="checked: settings.plugins.SerialCommunicator.events.Alert"><label for="Alert">Alert</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Conveyor" data-bind="checked: settings.plugins.SerialCommunicator.events.Conveyor"><label for="Conveyor">Conveyor</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="Eject" data-bind="checked: settings.plugins.SerialCommunicator.events.Eject"><label for="Eject">Eject</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="EStop" data-bind="checked: settings.plugins.SerialCommunicator.events.EStop"><label for="EStop">EStop</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="FilamentChange" data-bind="checked: settings.plugins.SerialCommunicator.events.FilamentChange"><label for="FilamentChange">FilamentChange</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="ToolChange" data-bind="checked: settings.plugins.SerialCommunicator.events.ToolChange"><label for="ToolChange">ToolChange</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="CommandSuppressed" data-bind="checked: settings.plugins.SerialCommunicator.events.CommandSuppressed"><label for="CommandSuppressed">CommandSuppressed</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="InvalidToolReported" data-bind="checked: settings.plugins.SerialCommunicator.events.InvalidToolReported"><label for="InvalidToolReported">InvalidToolReported</label></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse6">Timelapses</a>
+                                </ins>
+                            </div>
+                            <div id="collapse6" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="CaptureStart" data-bind="checked: settings.plugins.SerialCommunicator.events.CaptureStart"><label for="CaptureStart">CaptureStart</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="CaptureDone" data-bind="checked: settings.plugins.SerialCommunicator.events.CaptureDone"><label for="CaptureDone">CaptureDone</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="CaptureFailed" data-bind="checked: settings.plugins.SerialCommunicator.events.CaptureFailed"><label for="CaptureFailed">CaptureFailed</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="MovieRendering" data-bind="checked: settings.plugins.SerialCommunicator.events.MovieRendering"><label for="MovieRendering">MovieRendering</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="MovieDone" data-bind="checked: settings.plugins.SerialCommunicator.events.MovieDone"><label for="MovieDone">MovieDone</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="MovieFailed" data-bind="checked: settings.plugins.SerialCommunicator.events.MovieFailed"><label for="MovieFailed">MovieFailed</label></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse7">Slicing</a>
+                                </ins>
+                            </div>
+                            <div id="collapse7" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SlicingStarted" data-bind="checked: settings.plugins.SerialCommunicator.events.SlicingStarted"><label for="SlicingStarted">SlicingStarted</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SlicingDone" data-bind="checked: settings.plugins.SerialCommunicator.events.SlicingDone"><label for="SlicingDone">SlicingDone</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SlicingCancelled" data-bind="checked: settings.plugins.SerialCommunicator.events.SlicingCancelled"><label for="SlicingCancelled">SlicingCancelled</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SlicingFailed" data-bind="checked: settings.plugins.SerialCommunicator.events.SlicingFailed"><label for="SlicingFailed">SlicingFailed</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SlicingProfileAdded" data-bind="checked: settings.plugins.SerialCommunicator.events.SlicingProfileAdded"><label for="SlicingProfileAdded">SlicingProfileAdded</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SlicingProfileModified" data-bind="checked: settings.plugins.SerialCommunicator.events.SlicingProfileModified"><label for="SlicingProfileModified">SlicingProfileModified</label></div>
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SlicingProfileDeleted" data-bind="checked: settings.plugins.SerialCommunicator.events.SlicingProfileDeleted"><label for="SlicingProfileDeleted">SlicingProfileDeleted</label></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse8">Settings</a>
+                                </ins>
+                            </div>
+                            <div id="collapse8" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="SettingsUpdated" data-bind="checked: settings.plugins.SerialCommunicator.events.SettingsUpdated"><label for="SettingsUpdated">SettingsUpdated</label></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <ins class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse9">Printer Profile</a>
+                                </ins>
+                            </div>
+                            <div id="collapse9" class="panel-collapse collapse">
+                                <div class="checkbox"><input class="custom" type="checkbox" id="PrinterProfileModified" data-bind="checked: settings.plugins.SerialCommunicator.events.PrinterProfileModified"><label for="PrinterProfileModified">PrinterProfileModified</label></div>
+                            </div>
+                            <p><label> <br>Click <a href=https://docs.octoprint.org/en/master/events/index.html# target="_blank">here</a> for more information about events.</label></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </form>

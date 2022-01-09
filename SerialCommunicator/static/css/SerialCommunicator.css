@@ -1,0 +1,18 @@
+input[type="checkbox"]
+{
+    vertical-align:middle;
+}
+label,input{
+    display: inline-block;
+    vertical-align: middle;
+}
+table, th, td {
+border: 1px #eeeeee;
+border-collapse: collapse;
+}
+th, td {
+padding: 5px;
+}
+.custom_container {
+    width: 600px;
+}

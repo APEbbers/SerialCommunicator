@@ -1,7 +1,0 @@
-/* TODO: Have your plugin's CSS files generated to here. */
-#tab_plugin_SerialCommunicator iframe {
-    width: 100%;
-    height: 600px;
-    border: 1px solid #808080;
-}
-
