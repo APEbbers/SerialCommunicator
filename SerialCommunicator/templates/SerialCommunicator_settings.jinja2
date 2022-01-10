@@ -5,6 +5,7 @@
             <li><a data-toggle="pill" href="#gcode_commands">Gcode commands</a></li>
             <li><a data-toggle="pill" href="#action_commands">Action commands</a></li>
             <li><a data-toggle="pill" href="#events">Events</a></li>
+            <li><a data-toggle="pill" href="#examples">Examples</a></li>
         </ul>
 
         <div class="tab-content">
@@ -27,14 +28,14 @@
                     <option value="9600">9600</option>
                 </select>
             </div>
-            <div id="gcode_commands" class="tab-pane fade">                
+            <div id="gcode_commands" class="tab-pane">
                 <div><label class="">Separate commands with ";". (For example: M117;M500)</label></div>
                 <div><input id="gcode_commands" type="text" class="input-mini text-left" style="width:400px" data-bind="value: settings.plugins.SerialCommunicator.gcode.gcode_commands"></div>
                 <p><label><br>Click <a href="https://www.reprap.org/wiki/G-code" target="_blank">here</a> for more information about gcode commands.</label></p>
             </div>
-            <div id="action_commands" class="tab-pane fade">                
-                <div class="table-responsive" style="width:600px">
-                    <table class="table table-striped table-bordered table-hover table-condensed mx-left w-auto">
+            <div id="action_commands" class="tab-pane">                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-condensed mx-left w-auto">
                         <thead>
                             <tr>
                                 <th><b>Action</b></th>
@@ -48,58 +49,58 @@
                         </colgroup>
                             <tr>
                                 <td><label>any</label></td>
-                                <td><input id="action_any_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_any"></td>
+                                <td><input id="action_any_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_any" readonly></td>
                             </tr>
                             <tr>
                                 <td><label>start</label></td>
-                                <td><input id="action_start_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_start"></td>
+                                <td><input id="action_start_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_start"></td>
                             </tr>
                             <tr>
                                 <td><label>cancel</label></td>
-                                <td><input id="action_cancel_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_cancel"></td>
+                                <td><input id="action_cancel_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_cancel"></td>
                             </tr>
                             <tr>
                                 <td><label>pause</label></td>
-                                <td><input id="action_pause_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_pause"></td>
+                                <td><input id="action_pause_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_pause"></td>
                             </tr>
                             <tr>
                                 <td><label>paused</label></td>
-                                <td><input id="action_paused_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_paused"></td>
+                                <td><input id="action_paused_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_paused"></td>
                             </tr>
                             <tr>
                                 <td><label>resume</label></td>
-                                <td><input id="action_resume_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_resume"></td>
+                                <td><input id="action_resume_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_resume"></td>
                             </tr>
                             <tr>
                                 <td><label>resumed</label></td>
-                                <td><input id="action_resumed_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_resumed"></td>
+                                <td><input id="action_resumed_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_resumed"></td>
                             </tr>
                             <tr>
                                 <td><label>disconnect</label></td>
-                                <td><input id="action_disconnect_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_disconnect"></td>
+                                <td><input id="action_disconnect_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_disconnect"></td>
                             </tr>
                             <tr>
                                 <td><label>notification</label></td>
-                                <td><input id="action_notification_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_notification"></td>
+                                <td><input id="action_notification_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_notification"></td>
                             </tr>
                             <tr>
                                 <td><label>sd_inserted</label></td>
-                                <td><input id="action_sd_inserted_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_sd_inserted"></td>
+                                <td><input id="action_sd_inserted_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_sd_inserted"></td>
                             </tr>
                             <tr>
                                 <td><label>sd_ejected</label></td>
-                                <td><input id="action_sd_ejected_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_sd_ejected"></td>
+                                <td><input id="action_sd_ejected_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_sd_ejected"></td>
                             </tr>
                             <tr>
                                 <td><label>sd_updated</label></td>
-                                <td><input id="action_sd_updated_message" type="text" style="width:500px" data-bind="checked: settings.plugins.SerialCommunicator.action.action_sd_updated"></td>
+                                <td><input id="action_sd_updated_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_sd_updated"></td>
                             </tr>
                         </tbody>
                     </table>            
                 </div> 
                 <div><label>Click <a href="https://docs.octoprint.org/en/master/features/action_commands.html#sec-features-action-commands" target="_blank">here</a> for more information about action commands.</label></div>                          
             </div>
-            <div id="events" class="tab-pane fade">
+            <div id="events" class="tab-pane">
                 <div id="serial_connection" class="tab-pane in active">
                     <div class="panel-group" id="accordion">
                         <div class="panel panel-default">
@@ -250,6 +251,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div id="examples" class="tab-pane">
+
             </div>
         </div>
     </div>

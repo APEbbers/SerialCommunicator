@@ -173,50 +173,52 @@ class SerialCommunicatorPlugin(
                 self._logger.info(f"gcode: {gcode} sent.")
 
     def HandleActionMessage(self, comm, line, action, name, params, *args, **kwargs):
-        action_any = "any;"+str(self._settings.get(['action', 'action_any']))
-        action_start = "start;" + \
-            str(self._settings.get(['action', 'action_start']))
-        action_cancel = "cancel;" + \
-            str(self._settings.get(['action', 'action_cancel']))
-        action_pause = "pause;" + \
-            str(self._settings.get(['action', 'action_pause']))
-        action_paused = "paused;" + \
-            str(self._settings.get(['action', 'action_paused']))
-        action_resume = "resume;" + \
-            str(self._settings.get(['action', 'action_resume']))
-        action_resumed = "resumed;" + \
-            str(self._settings.get(['action', 'action_resumed']))
-        action_disconnect = "disconnect;" + \
-            str(self._settings.get(['action', 'action_disconnect']))
-        action_notification = "notification;" + \
-            str(self._settings.get(['action', 'action_notification']))
-        action_sd_inserted = "sd_inserted;" + \
-            str(self._settings.get(['action', 'action_sd_inserted']))
-        action_sd_ejected = "sd_ejected;" + \
-            str(self._settings.get(['action', 'action_sd_ejected']))
-        action_sd_updated = "sd_updated;" + \
-            str(self._settings.get(['action', 'action_sd_updated']))
+        # self._logger.debug(f"action name: {name}, action message: {line} recieved bij OctoPrint")
 
-        MessageArray = [action_any, action_start, action_cancel, action_pause, action_paused, action_resume,
+        action_any = "any;"+self._settings.get(['action', 'action_any'])
+        action_start = "start;" + \
+            self._settings.get(['action', 'action_start'])
+        action_cancel = "cancel;" + \
+            self._settings.get(['action', 'action_cancel'])
+        action_pause = "pause;" + \
+            self._settings.get(['action', 'action_pause'])
+        action_paused = "paused;" + \
+            self._settings.get(['action', 'action_paused'])
+        action_resume = "resume;" + \
+            self._settings.get(['action', 'action_resume'])
+        action_resumed = "resumed;" + \
+            self._settings.get(['action', 'action_resumed'])
+        action_disconnect = "disconnect;" + \
+            self._settings.get(['action', 'action_disconnect'])
+        action_notification = "notification;" + \
+            self._settings.get(['action', 'action_notification'])
+        action_sd_inserted = "sd_inserted;" + \
+            self._settings.get(['action', 'action_sd_inserted'])
+        action_sd_ejected = "sd_ejected;" + \
+            self._settings.get(['action', 'action_sd_ejected'])
+        action_sd_updated = "sd_updated;" + \
+            self._settings.get(['action', 'action_sd_updated'])
+
+        LinesArray = [action_any, action_start, action_cancel, action_pause, action_paused, action_resume,
                         action_resumed, action_disconnect, action_notification, action_sd_inserted, action_sd_ejected, action_sd_updated]
-        for Message in MessageArray:
-            action_name = str(Message).split(";")[0]
-            action_message = str(Message).split(";")[1]
-            action_line = Message
-            self._logger.debug(f"action name: {action_name}, action message: {action_message}")
-            if action_message != "":
-                if action_name == name and action_name != "any" and action_message in line:
-                    if self._settings.get(["connection", "selectedPort"]) == "VIRTUAL":
-                        self._logger.debug("No serial connection")
-                    else:
-                        self.SendSerialMessage(action_name)
-                    self._logger.info(f"action name: {action_name} sent.")
-                if action_name == "any" and action_message in action:
-                    if self._settings.get(["connection", "selectedPort"]) == "VIRTUAL":
-                        self._logger.debug("No serial connection")
-                    else:
-                        self.SendSerialMessage(action_line)
-                    self._logger.info(f"action line: {action_line} sent.")
+        for action_line in LinesArray:
+            action_name = str(action_line).split(";")[0]
+            action_messages = str(action_line).split(";")[1].split(";")
+            # self._logger.debug(f"action name: {action_name}, action message: {action_message}")
+            if action_messages != "":
+                for action_message in action_messages:
+                    if action_name == name and action_name != "any" and action_message in action:
+                        if self._settings.get(["connection", "selectedPort"]) == "VIRTUAL":
+                            self._logger.debug("No serial connection")
+                        else:
+                            self.SendSerialMessage(action_name)
+                        self._logger.info(f"action name: {action_name} sent.")
+                    if action_name == "any" and action_message in action:
+                        if self._settings.get(["connection", "selectedPort"]) == "VIRTUAL":
+                            self._logger.debug("No serial connection")
+                        else:
+                            self.SendSerialMessage(action_name)
+                        self._logger.info(f"action line: {action_name} sent.")
 
     def on_event(self, event, payload):
         eventlist = {"Startup", "Shutdown", "ClientOpened", "ClientAuthed", "ClientClosed", "UserLoggedIn", "UserLoggedOut", "ConnectivityChanged", "Connecting", "Connected", "Disconnecting", "Disconnected", "Error", "PrinterStateChanged", "Upload", "FileAdded", "FileRemoved", "FolderAdded", "FolderRemoved", "UpdatedFiles", "MetadataAnalysisStarted", "MetadataAnalysisFinished", "FileSelected", "FileDeselected", "TransferStarted", "TransferDone", "PrintStarted", "PrintFailed", "PrintDone", "PrintCancelling",
@@ -266,8 +268,8 @@ __plugin_name__ = "SerialCommunicator Plugin"
 
 
 # __plugin_pythoncompat__ = ">=2.7,<3"  # only python 2
-# __plugin_pythoncompat__ = ">=3,<4"  # only python 3
-__plugin_pythoncompat__ = ">=2.7,<4"  # python 2 and 3
+__plugin_pythoncompat__ = ">=3,<4"  # only python 3
+# __plugin_pythoncompat__ = ">=2.7,<4"  # python 2 and 3
 
 
 def __plugin_load__():

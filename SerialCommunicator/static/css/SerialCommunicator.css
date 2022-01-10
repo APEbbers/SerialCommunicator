@@ -1,6 +1,7 @@
 input[type="checkbox"]
 {
     vertical-align:middle;
+    padding-right: 0%;
 }
 label,input{
     display: inline-block;
