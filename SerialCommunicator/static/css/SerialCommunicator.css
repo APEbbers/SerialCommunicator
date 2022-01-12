@@ -1,19 +1,26 @@
-input[type="checkbox"]
+#settings_plugin_SerialCommunicator .input[type="checkbox"]
 {
     vertical-align:middle;
     padding-right: 0%;
 }
-label,input{
+#settings_plugin_SerialCommunicator .label,input{
     display: inline-block;
     vertical-align: middle;
 }
-table, th, td {
-border: 1px #eeeeee;
+#settings_plugin_SerialCommunicator .table, #settings_plugin_SerialCommunicator th, #settings_plugin_SerialCommunicator td {
+border: 1px #a39f9f;
 border-collapse: collapse;
+border-style: solid;
 }
-th, td {
+#settings_plugin_SerialCommunicator .td {
 padding: 5px;
 }
-.custom_container {
+#settings_plugin_SerialCommunicator .th {
+padding-top: 12px;
+padding-bottom: 12px;
+border-bottom: 3px #6e6d6d;
+border-style: solid;
+}
+#settings_plugin_SerialCommunicator .custom_container {
     width: 600px;
 }

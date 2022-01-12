@@ -151,10 +151,17 @@ class SerialCommunicatorPlugin(
                 if file_content.type=='dir':
                     contents.extend(repo.get_contents(file_content.path))
                 else :
-                    self._logger.debug(repo_url + str(file_content.path))
-                    LinkArray.append(repo_url + str(file_content.path) + "#" + file_content.name)
+                    path = str(file_content.path).replace(' ', '%20')
+                    self._logger.debug(repo_url + path)
+                    LinkArray.append(f"{repo_url + path}#{file_content.name}")
         except  RateLimitExceededException:
-            self._logger.info("too many requests to GitHub repository!")
+            search_rate_limit = g.get_rate_limit().search
+            reset_timestamp = calendar.timegm(search_rate_limit.reset.timetuple())
+            # add 10 seconds to be sure the rate limit has been reset
+            sleep_time = reset_timestamp - calendar.timegm(time.gmtime()) + 10
+
+            self._logger.info(f"Too many requests to the GitHub repository! Please retry over {sleep_time}")
+            LinkArray.append(f'https://github.com/#Too many requests to the GitHub repository! Please refresh over {sleep_time}')
         return LinkArray
          
     def on_settings_save(self, data):
