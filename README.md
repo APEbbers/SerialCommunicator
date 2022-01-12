@@ -1,7 +1,7 @@
 # SerialCommunicator
 
 This plugin let you send gcodes, action commands and events to an arduino. (or any other device). The arduino then can do something, for example change the color of a LED strip.
-The plugin is developed with an usb connection in mind between a raspberry PI and an arduino.
+The plugin is developed with an usb serial connection in mind between a Raspberry PI and an arduino.
 
 
 ## Setup
@@ -25,8 +25,8 @@ After installing you will find the plugin under settings.
 ![image](https://user-images.githubusercontent.com/10145631/149211146-05340218-3b55-437a-a883-88208128c27f.png)
 
 Here can you:
-- Select the USB port to which the arduino is connected. The USB port is identified with VID and PID numbers. THe plugin will remember these numbers for next time and makes sure   
-  that even when a different USB port is used, the correct USB port will be selected..
+- Select the USB port to which the arduino is connected. The USB port is identified with the VID and PID numbers of the connected device. 
+  The plugin will uses these numbers to automaticly connect to the same device next time you start OctoPrint. Even when you plug your device to a different USB port.
 - Select the baudrate. (The arduino must be programmed with the same baudrate!)
 
 
