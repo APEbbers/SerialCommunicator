@@ -1,7 +1,8 @@
 # SerialCommunicator
 
-This plugin let you send gcodes, action commands and events to an arduino. (or any other device). The ardion then can do somethin. For example change the color of a LED strip.
+This plugin let you send gcodes, action commands and events to an arduino. (or any other device). The arduino then can do something, for example change the color of a LED strip.
 The plugin is developed with an usb connection between a raspberry PI and an arduino in mind.
+
 
 ## Setup
 
@@ -10,8 +11,7 @@ or manually using this URL:
 
     https://github.com/APEbbers/SerialCommunicator/archive/master.zip
 
-**TODO:** Describe how to install your plugin, if more needs to be done than just installing it via pip or through
-the plugin manager.
+
 
 ## Configuration
 
