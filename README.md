@@ -1,7 +1,7 @@
 # SerialCommunicator
 
 This plugin let you send gcodes, action commands and events to an arduino. (or any other device). The arduino then can do something, for example change the color of a LED strip.
-The plugin is developed with an usb connection between a raspberry PI and an arduino in mind.
+The plugin is developed with an usb connection in mind between a raspberry PI and an arduino.
 
 
 ## Setup
