@@ -34,7 +34,7 @@ Here can you:
 
 ![image](https://user-images.githubusercontent.com/10145631/149211184-47827413-e2b9-450a-abeb-9bee31f2c993.png)
 
-- Enter an string of gcode commands, separated with ";" (For example: M500;M503;M81). When OctoPrint recieves one of these commands, the plugin will send these to the arduino.
+Enter an string of gcode commands, separated with ";" (For example: M500;M503;M81). When OctoPrint recieves one of these commands, the plugin will send these to the arduino.
 
 
 **Tab "Action commands"**
