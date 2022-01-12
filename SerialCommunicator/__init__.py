@@ -1,11 +1,12 @@
 # coding=utf-8
 from __future__ import absolute_import
-from octoprint.events import eventManager, Events
-
 import octoprint.plugin
 import serial.tools.list_ports
 from octoprint.util import comm as comm
-
+from github import Github
+from github import RateLimitExceededException
+import calendar
+import time
 
 class SerialCommunicatorPlugin(
         octoprint.plugin.StartupPlugin,
@@ -13,9 +14,9 @@ class SerialCommunicatorPlugin(
         octoprint.plugin.AssetPlugin,
         octoprint.plugin.EventHandlerPlugin,
         octoprint.plugin.SettingsPlugin):
-
+    
     def on_after_startup(self):
-        self._logger.info("SerialCommunicator")
+        self._logger.info("SerialCommunicator")        
 
     def get_settings_defaults(self):
         return {
@@ -104,6 +105,7 @@ class SerialCommunicatorPlugin(
                 "SlicingProfileDeleted": False,
                 "SettingsUpdated": False,
                 "PrinterProfileModified": False,
+            "Examples": "",
             }
         }
 
@@ -118,6 +120,9 @@ class SerialCommunicatorPlugin(
         )
 
     def get_template_vars(self):
+        return dict(selectedPort=self.getPorts(), Examples=self.getExamples())
+        
+    def getPorts(self):
         ports = serial.tools.list_ports.comports()
         result = []
 
@@ -131,8 +136,27 @@ class SerialCommunicatorPlugin(
         result.append("VIRTUAL_For testing")
 
         objItems = result
-        return dict(selectedPort=objItems)
+        return objItems   
 
+    def getExamples(self):
+        LinkArray = []
+        try:
+            g = Github()
+            repo = g.get_repo("APEbbers/SerialCommunicator")
+            contents = repo.get_contents("Examples")
+            repo_url = repo.html_url.removesuffix('.git') + '/tree/master/'
+
+            while len(contents)>0:
+                file_content = contents.pop(0)
+                if file_content.type=='dir':
+                    contents.extend(repo.get_contents(file_content.path))
+                else :
+                    self._logger.debug(repo_url + str(file_content.path))
+                    LinkArray.append(repo_url + str(file_content.path) + "#" + file_content.name)
+        except  RateLimitExceededException:
+            self._logger.info("too many requests to GitHub repository!")
+        return LinkArray
+         
     def on_settings_save(self, data):
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 

@@ -43,10 +43,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <colgroup>
-                            <col span="0" style="width:100px", >
-                            <col span="1" style="width:525px" >
-                        </colgroup>
+                            <colgroup>
+                                <col span="0" style="width:100px", >
+                                <col span="1" style="width:525px" >
+                            </colgroup>
                             <tr>
                                 <td><label>any</label></td>
                                 <td><input id="action_any_message" type="text" style="width:500px" data-bind="value: settings.plugins.SerialCommunicator.action.action_any" readonly></td>
@@ -253,7 +253,24 @@
                 </div>
             </div>
             <div id="examples" class="tab-pane">
-
+                <table class="table table-bordered table-hover table-condensed mx-left w-auto">
+                    <thead>
+                        <tr>
+                            <th><b>Links</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <colgroup>
+                            <col span="0" style="width:600px", >
+                        </colgroup>
+                        {% for x in plugin_SerialCommunicator_Examples %}
+                            {% set List1 = x.split('#') %}
+                            <tr>
+                            <td><label><a href={{List1[0]}} target="_blank">{{List1[1]}}</a></label></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
