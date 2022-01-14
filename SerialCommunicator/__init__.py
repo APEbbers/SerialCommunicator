@@ -8,15 +8,16 @@ from github import RateLimitExceededException
 import calendar
 import time
 
+
 class SerialCommunicatorPlugin(
         octoprint.plugin.StartupPlugin,
         octoprint.plugin.TemplatePlugin,
         octoprint.plugin.AssetPlugin,
         octoprint.plugin.EventHandlerPlugin,
         octoprint.plugin.SettingsPlugin):
-    
+
     def on_after_startup(self):
-        self._logger.info("SerialCommunicator")        
+        self._logger.info("SerialCommunicator")
 
     def get_settings_defaults(self):
         return {
@@ -105,7 +106,7 @@ class SerialCommunicatorPlugin(
                 "SlicingProfileDeleted": False,
                 "SettingsUpdated": False,
                 "PrinterProfileModified": False,
-            "Examples": "",
+                "Examples": list(),
             }
         }
 
@@ -121,7 +122,7 @@ class SerialCommunicatorPlugin(
 
     def get_template_vars(self):
         return dict(selectedPort=self.getPorts(), Examples=self.getExamples())
-        
+
     def getPorts(self):
         ports = serial.tools.list_ports.comports()
         result = []
@@ -133,10 +134,10 @@ class SerialCommunicatorPlugin(
             except Exception:
                 hwID = hwid
             result.append("{}#{}#[{}]".format(port, desc, hwID))
-        result.append("VIRTUAL_For testing")
+        result.append("VIRTUAL")
 
         objItems = result
-        return objItems   
+        return objItems
 
     def getExamples(self):
         LinkArray = []
@@ -146,24 +147,27 @@ class SerialCommunicatorPlugin(
             contents = repo.get_contents("Examples")
             repo_url = repo.html_url.removesuffix('.git') + '/tree/master/'
 
-            while len(contents)>0:
+            while len(contents) > 0:
                 file_content = contents.pop(0)
-                if file_content.type=='dir':
+                if file_content.type == 'dir':
                     contents.extend(repo.get_contents(file_content.path))
-                else :
+                else:
                     path = str(file_content.path).replace(' ', '%20')
                     self._logger.debug(repo_url + path)
                     LinkArray.append(f"{repo_url + path}#{file_content.name}")
-        except  RateLimitExceededException:
+        except RateLimitExceededException:
             search_rate_limit = g.get_rate_limit().search
-            reset_timestamp = calendar.timegm(search_rate_limit.reset.timetuple())
+            reset_timestamp = calendar.timegm(
+                search_rate_limit.reset.timetuple())
             # add 10 seconds to be sure the rate limit has been reset
             sleep_time = reset_timestamp - calendar.timegm(time.gmtime()) + 10
 
-            self._logger.info(f"Too many requests to the GitHub repository! Please retry over {sleep_time}")
-            LinkArray.append(f'https://github.com/#Too many requests to the GitHub repository! Please refresh over {sleep_time}')
+            self._logger.info(
+                f"Too many requests to the GitHub repository! Please retry over {sleep_time}")
+            LinkArray.append(
+                f'https://github.com/#Too many requests to the GitHub repository! Please refresh over {sleep_time} seconds')
         return LinkArray
-         
+
     def on_settings_save(self, data):
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
@@ -231,7 +235,7 @@ class SerialCommunicatorPlugin(
             self._settings.get(['action', 'action_sd_updated'])
 
         LinesArray = [action_any, action_start, action_cancel, action_pause, action_paused, action_resume,
-                        action_resumed, action_disconnect, action_notification, action_sd_inserted, action_sd_ejected, action_sd_updated]
+                      action_resumed, action_disconnect, action_notification, action_sd_inserted, action_sd_ejected, action_sd_updated]
         for action_line in LinesArray:
             action_name = str(action_line).split(";")[0]
             action_messages = str(action_line).split(";")[1].split(";")
@@ -254,11 +258,12 @@ class SerialCommunicatorPlugin(
     def on_event(self, event, payload):
         eventlist = {"Startup", "Shutdown", "ClientOpened", "ClientAuthed", "ClientClosed", "UserLoggedIn", "UserLoggedOut", "ConnectivityChanged", "Connecting", "Connected", "Disconnecting", "Disconnected", "Error", "PrinterStateChanged", "Upload", "FileAdded", "FileRemoved", "FolderAdded", "FolderRemoved", "UpdatedFiles", "MetadataAnalysisStarted", "MetadataAnalysisFinished", "FileSelected", "FileDeselected", "TransferStarted", "TransferDone", "PrintStarted", "PrintFailed", "PrintDone", "PrintCancelling",
                      "PrintCancelled", "PrintPaused", "PrintResumed", "PowerOn", "PowerOff", "Home", "ZChange", "Dwell", "Waiting", "Cooling", "Alert", "Conveyor", "Eject", "EStop", "FilamentChange", "ToolChange", "CommandSuppressed", "InvalidToolReported", "CaptureStart", "CaptureDone", "CaptureFailed", "MovieRendering", "MovieDone", "MovieFailed", "SlicingStarted", "SlicingDone", "SlicingCancelled", "SlicingFailed", "SlicingProfileAdded", "SlicingProfileModified", "SlicingProfileDeleted", "SettingsUpdated", "PrinterProfileModified"}
-        
+
         for eventname in eventlist:
             if self._settings.get(["events", eventname]):
                 eventParameter = self._settings.get(['events', eventname])
-                self._logger.debug(f"eventname: {eventname}, event: {event}, eventParameter: {eventParameter}")
+                self._logger.debug(
+                    f"eventname: {eventname}, event: {event}, eventParameter: {eventParameter}")
                 if eventname == event and eventParameter != False:
                     self._logger.debug(f"event: {event}detected!")
 

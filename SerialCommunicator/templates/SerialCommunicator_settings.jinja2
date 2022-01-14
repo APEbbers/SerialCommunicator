@@ -14,7 +14,11 @@
                 <select id="selectedPort" class="custom_checkbox-select" style="width:100%;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedPort">
                     {% for x in plugin_SerialCommunicator_selectedPort %}
                         {% set List1 = x.split('#') %} 
-                        <option value="{{List1[2]}}">{{List1[0]}} - {{List1[1]}} - {{List1[2]}}</option>
+                            {% if List1[0] in "VIRTUAL" %}
+                                <option value="VIRTUAL">VIRTUAL</option>
+                            {% else %}
+                                <option value="{{List1[2]}}">{{List1[0]}} - {{List1[1]}} - {{List1[2]}}</option>
+                            {% endif %}
                     {% endfor %}
                 </select>
                 <h5>Baudrate</h5>
@@ -253,7 +257,7 @@
                 </div>
             </div>
             <div id="examples" class="tab-pane">
-                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto">
+                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto" data-bind="click: settings.plugins.SerialCommunicator.Examples">
                     <thead>
                         <tr>
                             <th><b>Links</b></th>
@@ -266,7 +270,7 @@
                         {% for x in plugin_SerialCommunicator_Examples %}
                             {% set List1 = x.split('#') %}
                             <tr>
-                            <td><label><a href={{List1[0]}} target="_blank">{{List1[1]}}</a></label></td>
+                                <td><label><a href={{List1[0]}} target="_blank">{{List1[1]}}</a></label></td>
                             </tr>
                         {% endfor %}
                     </tbody>
