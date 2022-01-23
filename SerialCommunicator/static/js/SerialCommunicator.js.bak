@@ -8,7 +8,7 @@ $(function () {
     function SerialCommunicatorViewModel(parameters) {
         var self = this;
 
-        self.settings = parameters[0]
+        self.settings = parameters[0]; // requested as second dependency below
 
         self.command_definitions = ko.observableArray();
 
@@ -23,7 +23,7 @@ $(function () {
         self.onBeforeBinding = function () {
             self.settings.plugins.SerialCommunicator.command_definitions.subscribe(function () {
                 settings = self.settings.plugins.SerialCommunicator;
-                self.command_definitions(set.command_definitions.slice(0))
+                self.command_definitions(settings.command_definitions.slice(0))
             });
             self.settings.plugins.SerialCommunicator.command_definitions.valueHasMutated();
         };
@@ -34,18 +34,24 @@ $(function () {
 
     }
 
-    // This is how our plugin registers itself with the application, by adding some configuration
-    // information to the global variable OCTOPRINT_VIEWMODELS
-    ADDITIONAL_VIEWMODELS.push([
-        // This is the constructor to call for instantiating the plugin
-        SerialCommunicatorViewModel,
+    // // This is how our plugin registers itself with the application, by adding some configuration
+    // // information to the global variable OCTOPRINT_VIEWMODELS
+    // OCTOPRINT_VIEWMODELS.push([
+    //     // This is the constructor to call for instantiating the plugin
+    //     SerialCommunicatorViewModel,
 
-        // This is a list of dependencies to inject into the plugin, the order which you request
-        // here is the order in which the dependencies will be injected into your view model upon
-        // instantiation via the parameters argument
-        ["settingsViewModel"],
+    //     // This is a list of dependencies to inject into the plugin, the order which you request
+    //     // here is the order in which the dependencies will be injected into your view model upon
+    //     // instantiation via the parameters argument
+    //     ["settingsViewModel"],
 
-        // Finally, this is the list of selectors for all elements we want this viewmodel to be bound to.
-        ["#settings_plugin_SerialCommunicator"]
-    ]);
+    //     // Finally, this is the list of selectors for all elements we want this viewmodel to be bound to.
+    //     ["#settings_plugin_SerialCommunicator"]
+    // ]);
+    OCTOPRINT_VIEWMODELS.push({
+        construct: SerialCommunicatorViewModel,
+        additionalNames: ["SerialCommunicatorViewModel"],
+        dependencies: ["settingsViewModel"],
+        elements: ["#settings_plugin_SerialCommunicator"]
+    });
 });

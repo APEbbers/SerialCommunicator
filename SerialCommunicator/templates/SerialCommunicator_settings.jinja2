@@ -6,6 +6,7 @@
             <li><a data-toggle="pill" href="#action_commands">Action commands</a></li>
             <li><a data-toggle="pill" href="#events">Events</a></li>
             <li><a data-toggle="pill" href="#examples">Examples</a></li>
+            {# <li><a data-toggle="pill" href="#test">test</a></li> #}
         </ul>
 
         <div class="tab-content">
@@ -15,7 +16,7 @@
                     {% for x in plugin_SerialCommunicator_selectedPort %}
                         {% set List1 = x.split('#') %} 
                             {% if List1[0] in "VIRTUAL" %}
-                                <option value="VIRTUAL">VIRTUAL</option>
+                                <option value="VIRTUAL - SC">VIRTUAL</option>
                             {% else %}
                                 <option value="{{List1[2]}}">{{List1[0]}} - {{List1[1]}} - {{List1[2]}}</option>
                             {% endif %}
@@ -257,7 +258,7 @@
                 </div>
             </div>
             <div id="examples" class="tab-pane">
-                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto" data-bind="click: settings.plugins.SerialCommunicator.Examples">
+                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto">
                     <thead>
                         <tr>
                             <th><b>Links</b></th>

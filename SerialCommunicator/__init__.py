@@ -1,13 +1,13 @@
 # coding=utf-8
 from __future__ import absolute_import
+
+import calendar
+from distutils.log import debug
+import time
 import octoprint.plugin
 import serial.tools.list_ports
+from github import Github, RateLimitExceededException
 from octoprint.util import comm as comm
-from github import Github
-from github import RateLimitExceededException
-import calendar
-import time
-
 
 class SerialCommunicatorPlugin(
         octoprint.plugin.StartupPlugin,
@@ -107,7 +107,7 @@ class SerialCommunicatorPlugin(
                 "SettingsUpdated": False,
                 "PrinterProfileModified": False,
                 "Examples": list(),
-            }
+            },
         }
 
     def get_template_configs(self):
@@ -117,7 +117,7 @@ class SerialCommunicatorPlugin(
 
     def get_assets(self):
         return dict(
-            css=["css/SerialCommunicator.css"]
+            css=["css/SerialCommunicator.css"],
         )
 
     def get_template_vars(self):
@@ -126,14 +126,16 @@ class SerialCommunicatorPlugin(
     def getPorts(self):
         ports = serial.tools.list_ports.comports()
         result = []
-
+        PrinterConnection = self._printer.get_current_connection()
+        
         for port, desc, hwid, in sorted(ports):
             try:
                 StringA = str(hwid)
                 hwID = StringA[:StringA.index("LOCATION")-1]
             except Exception:
                 hwID = hwid
-            result.append("{}#{}#[{}]".format(port, desc, hwID))
+            if port != PrinterConnection[1]:
+                result.append("{}#{}#[{}]".format(port, desc, hwID))
         result.append("VIRTUAL")
 
         objItems = result
@@ -145,7 +147,7 @@ class SerialCommunicatorPlugin(
             g = Github()
             repo = g.get_repo("APEbbers/SerialCommunicator")
             contents = repo.get_contents("Examples")
-            repo_url = repo.html_url.removesuffix('.git') + '/tree/master/'
+            repo_url = str(repo.html_url).replace('.git', '') + '/tree/master/'
 
             while len(contents) > 0:
                 file_content = contents.pop(0)
@@ -173,16 +175,19 @@ class SerialCommunicatorPlugin(
 
     def SendSerialMessage(self, message):
         ports = serial.tools.list_ports.comports()
+        PrinterConnection = self._printer.get_current_connection()
+        self._logger.debug(f"Printer port is: {PrinterConnection[1]}")
         result = []
         self._logger.debug(f"{message} recieved in handler.")
 
         for port, desc, hwid, in sorted(ports):
-            try:
-                StringA = str(hwid)
-                hwID = StringA[:StringA.index("LOCATION")-1]
-            except Exception:
-                hwID = hwid
-            result.append("{}#{}#[{}]".format(port, desc, hwID))
+            if port != PrinterConnection[1]:
+                try:
+                    StringA = str(hwid)
+                    hwID = StringA[:StringA.index("LOCATION")-1]
+                except Exception:
+                    hwID = hwid
+                result.append("{}#{}#[{}]".format(port, desc, hwID))
         for item in result:
             hwID = str(item).split("#")[2]
             port = str(item).split("#")[0]
