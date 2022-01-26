@@ -2,12 +2,16 @@
 from __future__ import absolute_import
 
 import calendar
+from curses import baudrate
 from distutils.log import debug
 import time
 import octoprint.plugin
+import serial
 import serial.tools.list_ports
 from github import Github, RateLimitExceededException
 from octoprint.util import comm as comm
+import termios
+
 
 class SerialCommunicatorPlugin(
         octoprint.plugin.StartupPlugin,
@@ -123,24 +127,29 @@ class SerialCommunicatorPlugin(
     def get_template_vars(self):
         return dict(selectedPort=self.getPorts(), Examples=self.getExamples())
 
+    # Get the ports for the jinja2 template
     def getPorts(self):
-        ports = serial.tools.list_ports.comports()
+        ports = serial.tools.list_ports.comports()  # get al the active ports
         result = []
+        # Get the connection between printer and octoprint
         PrinterConnection = self._printer.get_current_connection()
-        
+
         for port, desc, hwid, in sorted(ports):
             try:
                 StringA = str(hwid)
                 hwID = StringA[:StringA.index("LOCATION")-1]
             except Exception:
                 hwID = hwid
+            # If the port is not equal to the connection between octoprint and the printer, add it to the list.
             if port != PrinterConnection[1]:
                 result.append("{}#{}#[{}]".format(port, desc, hwID))
         result.append("VIRTUAL")
+        ports.clear()
 
         objItems = result
         return objItems
 
+    # get example sketches for a arduino board from a github repository.
     def getExamples(self):
         LinkArray = []
         try:
@@ -173,33 +182,59 @@ class SerialCommunicatorPlugin(
     def on_settings_save(self, data):
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
+    # send the message to the arduino over the selected (usb) serial port.
     def SendSerialMessage(self, message):
-        ports = serial.tools.list_ports.comports()
+        # Get the connection between printer and octoprint
         PrinterConnection = self._printer.get_current_connection()
         self._logger.debug(f"Printer port is: {PrinterConnection[1]}")
         result = []
         self._logger.debug(f"{message} recieved in handler.")
 
-        for port, desc, hwid, in sorted(ports):
-            if port != PrinterConnection[1]:
+        ports = serial.tools.list_ports.comports()  # get al the active ports
+        for objPort, objDesc, objHWid, in sorted(ports):
+            # If the port is not equal to the connection between octoprint and the printer, add it to the list.
+            if objPort != PrinterConnection[1]:
                 try:
-                    StringA = str(hwid)
+                    StringA = str(objHWid)
                     hwID = StringA[:StringA.index("LOCATION")-1]
                 except Exception:
-                    hwID = hwid
-                result.append("{}#{}#[{}]".format(port, desc, hwID))
+                    hwID = objHWid
+                result.append("{}#{}#[{}]".format(objPort, objDesc, hwID))
         for item in result:
             hwID = str(item).split("#")[2]
-            port = str(item).split("#")[0]
+            objPort = str(item).split("#")[0]
+            # if the hardware id is equal to the one saved under config.yaml (settings), send the message over serial.
             if hwID == self._settings.get(["connection", "selectedPort"]):
-                self._logger.debug(f"hwID: {hwID}, port: {port}")
-                ser = serial.Serial(port)
-                ser.baudrate = int(self._settings.get(
-                    ["connection", "selectedBaudrate"]))
-                ser.timeout = 10
-                ser.write(bytes(message, 'utf-8'))
+                # self._logger.info(f"hwID: {hwID}, port: {objPort}")
+
+                # Solution to open the port properly (bug in PySerial):
+                # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
+                # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
+                f = open(objPort)
+                attrs = termios.tcgetattr(f)
+                attrs[2] = attrs[2] & ~termios.HUPCL
+                termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
+                f.close()
+                # --------------------------------------------------------------------------------------------------
+                ser = serial.Serial(
+                    port=objPort,
+                    baudrate=int(self._settings.get(
+                        ["connection", "selectedBaudrate"])),
+                )
+                try:
+                    ser.open()
+                except serial.SerialException:
+                    ser.close()
+                    ser.open()
+                ser.reset_input_buffer()
+                ser.write(str(message).encode('ascii'))
+                if ser.isOpen() == True:
+                    self._logger.info(
+                        f"{message} sent. port={ser.port}, baudrate={ser.baudrate}")
+                if ser.isOpen() == False:
+                    self._logger.info(
+                        f"Serial is closed! port={ser.port}, baudrate={ser.baudrate}")
                 ser.close()
-                self._logger.info(f"{message} sent.")
 
     def HandleGCODE(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         c = self._settings.get(['gcode', 'gcode_commands'])
