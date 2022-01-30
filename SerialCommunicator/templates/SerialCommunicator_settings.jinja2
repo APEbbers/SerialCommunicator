@@ -1,16 +1,16 @@
 <form class="form-horizontal">
     <div class="custom_container">
         <ul class="nav nav-pills">
-            <li class="active"><a data-toggle="pill" href="#serial_connection">Connection</a></li>
+            <li class="active"><a data-toggle="pill" href="#Settings">Settings</a></li>
             <li><a data-toggle="pill" href="#gcode_commands">Gcode commands</a></li>
             <li><a data-toggle="pill" href="#action_commands">Action commands</a></li>
             <li><a data-toggle="pill" href="#events">Events</a></li>
+            <li><a data-toggle="pill" href="#Printer_respones">Printer respones</a></li>
             <li><a data-toggle="pill" href="#examples">Examples</a></li>
-            {# <li><a data-toggle="pill" href="#test">test</a></li> #}
         </ul>
 
         <div class="tab-content">
-            <div id="serial_connection" class="tab-pane in active">
+            <div id="Settings" class="tab-pane in active">
                 <h5>Serial Port</h5>
                 <select id="selectedPort" class="custom_checkbox-select" style="width:100%;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedPort">
                     {% for x in plugin_SerialCommunicator_selectedPort %}
@@ -32,10 +32,14 @@
                     <option value="19200">19200</option>
                     <option value="9600">9600</option>
                 </select>
+                <h5>On/Off Button</h5>
+                <div id=IconSettings>
+                    <p><label>Icon:</label><input id="IconName" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.Icon"></p>
+                </div>
             </div>
             <div id="gcode_commands" class="tab-pane">
                 <div><label class="">Separate commands with ";". (For example: M117;M500)</label></div>
-                <div><input id="gcode_commands" type="text" class="input-mini text-left" style="width:400px" data-bind="value: settings.plugins.SerialCommunicator.gcode.gcode_commands"></div>
+                <div><input id="gcode_commands" type="text" class="input-mini text-left" style="width:400px" placeholder="Enter one of more commands here...." data-bind="value: settings.plugins.SerialCommunicator.gcode.gcode_commands"></div>
                 <p><label><br>Click <a href="https://www.reprap.org/wiki/G-code" target="_blank">here</a> for more information about gcode commands.</label></p>
             </div>
             <div id="action_commands" class="tab-pane">                
@@ -256,6 +260,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
+             <div id="Printer_respones" class="tab-pane">
+                <div><label class="">Separate words or set of words with ";". (For example: wait;Not SD printing;etc)</label></div>
+                <div><input id="Printer_respones" type="text" class="input-mini text-left" style="width:400px" placeholder="Enter one of more words here...." data-bind="value: settings.plugins.SerialCommunicator.returned_lines.string"></div>
+                <p><label><br>Click <a href="https://docs.octoprint.org/en/master/plugins/hooks.html#octoprint-comm-protocol-gcode-received" target="_blank">here</a> for more information about returned lines.</label></p>
             </div>
             <div id="examples" class="tab-pane">
                 <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto">

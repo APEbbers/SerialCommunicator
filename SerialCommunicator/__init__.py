@@ -2,8 +2,6 @@
 from __future__ import absolute_import
 
 import calendar
-from curses import baudrate
-from distutils.log import debug
 import time
 import octoprint.plugin
 import serial
@@ -18,10 +16,26 @@ class SerialCommunicatorPlugin(
         octoprint.plugin.TemplatePlugin,
         octoprint.plugin.AssetPlugin,
         octoprint.plugin.EventHandlerPlugin,
+        octoprint.plugin.SimpleApiPlugin,
         octoprint.plugin.SettingsPlugin):
 
+    # Simple API plugin
     def on_after_startup(self):
         self._logger.info("SerialCommunicator")
+
+    def get_api_commands(self):
+        self._logger.info(f"Manually triggered get_api.")
+        return dict(Switched=["ip"])
+
+    def on_api_command(self, command, data):
+        if command == 'Switched':
+            self._logger.debug(f"{data}")
+            if 'True' in str(data):
+                self.SendSerialMessage("On")
+                self._logger.debug(f"Switched on!")                
+            if 'False' in str(data):
+                self.SendSerialMessage("Off")
+                self._logger.debug(f"Switched off!")
 
     def get_settings_defaults(self):
         return {
@@ -45,6 +59,9 @@ class SerialCommunicatorPlugin(
                 "action_sd_inserted": "",
                 "action_sd_ejected": "",
                 "action_sd_updated": "",
+            },
+            "returned_lines": {
+                "string": "",
             },
             "events": {
                 "Startup": False,
@@ -112,16 +129,23 @@ class SerialCommunicatorPlugin(
                 "PrinterProfileModified": False,
                 "Examples": list(),
             },
+            "Switch": {
+                "Color": "",
+                "State": False,
+                "Icon": "",
+            }
         }
 
     def get_template_configs(self):
         return [
+            dict(type="navbar", custom_bindings=True),
             dict(type="settings", custom_bindings=False)
         ]
 
     def get_assets(self):
         return dict(
             css=["css/SerialCommunicator.css"],
+            js=["js/SerialCommunicator.js"],
         )
 
     def get_template_vars(self):
@@ -207,6 +231,7 @@ class SerialCommunicatorPlugin(
             if hwID == self._settings.get(["connection", "selectedPort"]):
                 # self._logger.info(f"hwID: {hwID}, port: {objPort}")
 
+                # uncomment for use with RPI
                 # Solution to open the port properly (bug in PySerial):
                 # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
                 # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
@@ -216,11 +241,10 @@ class SerialCommunicatorPlugin(
                 termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
                 f.close()
                 # --------------------------------------------------------------------------------------------------
-                ser = serial.Serial(
-                    port=objPort,
-                    baudrate=int(self._settings.get(
-                        ["connection", "selectedBaudrate"])),
-                )
+                ser = serial.Serial()
+                ser.port = objPort,
+                ser.baudrate = int(self._settings.get(
+                    ["connection", "selectedBaudrate"])),
                 try:
                     ser.open()
                 except serial.SerialException:
@@ -229,23 +253,36 @@ class SerialCommunicatorPlugin(
                 ser.reset_input_buffer()
                 ser.write(str(message).encode('ascii'))
                 if ser.isOpen() == True:
-                    self._logger.info(
+                    self._logger.debug(
                         f"{message} sent. port={ser.port}, baudrate={ser.baudrate}")
                 if ser.isOpen() == False:
-                    self._logger.info(
+                    self._logger.debug(
                         f"Serial is closed! port={ser.port}, baudrate={ser.baudrate}")
                 ser.close()
 
     def HandleGCODE(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         c = self._settings.get(['gcode', 'gcode_commands'])
         gcodeArray = str(c).split(";")
-        # self._logger.info(f"{gcode} Detected in {c}. {gcode} will be passed!.")
+        # self._logger.info(f"{cmd} Detected in {c}. {gcode} will be passed!.")
         if gcode in gcodeArray:
-            if self._settings.get(["connection", "selectedPort"]) == "VIRTUAL":
+            if "VIRTUAL" in self._settings.get(["connection", "selectedPort"]):
                 self._logger.debug("No serial connection")
             else:
                 self.SendSerialMessage(gcode)
-                self._logger.info(f"gcode: {gcode} sent.")
+                self._logger.debug(f"gcode: {gcode} sent.")
+
+    def HandleResponse(self, comm_instance, line, *args, **kwargs):
+        c = self._settings.get(['returned_lines', 'string'])
+        gcodeArray = str(c).split(";")
+        for objString in gcodeArray:
+            if objString != "" and objString in line:
+                if "VIRTUAL" in self._settings.get(["connection", "selectedPort"]):
+                    self._logger.debug(
+                        "No serial connection -> {objString} Detected in {line} ")
+                else:
+                    self.SendSerialMessage(objString)
+                    self._logger.debug(f"word(s): {objString} sent.")
+        return line
 
     def HandleActionMessage(self, comm, line, action, name, params, *args, **kwargs):
         # self._logger.debug(f"action name: {name}, action message: {line} recieved bij OctoPrint")
@@ -313,6 +350,18 @@ class SerialCommunicatorPlugin(
                         self.SendSerialMessage(str(event))
                         self._logger.info(f"event: {event} sent.")
 
+    def LightSwitch(self):
+        c = self._settings.get(['Switch', 'State'])
+        objresult = None
+        if c == False:
+            self.SendSerialMessage("Light_On")
+            objresult = True
+            self._logger.debug("Light_on")
+        if c == True:
+            self.SendSerialMessage("Light_Off")
+            objresult = False
+            self._logger.debug("Light_off")
+
     def on_settings_load(self):
         data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
         return data
@@ -356,6 +405,8 @@ def __plugin_load__():
     __plugin_hooks__ = {
         "octoprint.plugin.softwareupdate.check_config":
         __plugin_implementation__.get_update_information,
+        "octoprint.comm.protocol.gcode.received":
+        __plugin_implementation__.HandleResponse,
         "octoprint.comm.protocol.gcode.sent":
         __plugin_implementation__.HandleGCODE,
         "octoprint.comm.protocol.action":
