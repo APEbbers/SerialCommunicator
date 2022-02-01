@@ -11,30 +11,86 @@
 
         <div class="tab-content">
             <div id="Settings" class="tab-pane in active">
-                <h5>Serial Port</h5>
-                <select id="selectedPort" class="custom_checkbox-select" style="width:100%;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedPort">
-                    {% for x in plugin_SerialCommunicator_selectedPort %}
-                        {% set List1 = x.split('#') %} 
-                            {% if List1[0] in "VIRTUAL" %}
-                                <option value="VIRTUAL - SC">VIRTUAL</option>
-                            {% else %}
-                                <option value="{{List1[2]}}">{{List1[0]}} - {{List1[1]}} - {{List1[2]}}</option>
-                            {% endif %}
-                    {% endfor %}
-                </select>
-                <h5>Baudrate</h5>
-                <select id="connection_baudrates_SC" class="custom_checkbox-select" style="width:100px;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedBaudrate">
-                    <option value="250000">250000</option>
-                    <option value="230400">230400</option>
-                    <option value="115200">115200</option>
-                    <option value="57600">57600</option>
-                    <option value="38400">38400</option>
-                    <option value="19200">19200</option>
-                    <option value="9600">9600</option>
-                </select>
-                <h5>On/Off Button</h5>
+                <h5>Connection settings</h5>
+                    <h6>Serial Port</h6>
+                    <select id="selectedPort" class="custom_checkbox-select" style="width:100%;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedPort">
+                        {% for x in plugin_SerialCommunicator_selectedPort %}
+                            {% set List1 = x.split('#') %} 
+                                {% if List1[0] in "VIRTUAL" %}
+                                    <option value="VIRTUAL - SC">VIRTUAL</option>
+                                {% else %}
+                                    <option value="{{List1[2]}}">{{List1[0]}} - {{List1[1]}} - {{List1[2]}}</option>
+                                {% endif %}
+                        {% endfor %}
+                    </select>
+                    <h6>Baudrate</h6>
+                    <select id="connection_baudrates_SC" class="custom_checkbox-select" style="width:100px;" data-bind="value: settings.plugins.SerialCommunicator.connection.selectedBaudrate">
+                        <option value="250000">250000</option>
+                        <option value="230400">230400</option>
+                        <option value="115200">115200</option>
+                        <option value="57600">57600</option>
+                        <option value="38400">38400</option>
+                        <option value="19200">19200</option>
+                        <option value="9600">9600</option>
+                    </select>
+                <h5><br>Navigation bar switch settings</h5>
                 <div id=IconSettings>
-                    <p><label>Icon:</label><input id="IconName" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.Icon"></p>
+                    <div class="checkbox"><input class="custom" type="checkbox" id="EnableOnOffBtn" data-bind="checked: settings.plugins.SerialCommunicator.Switch.EnableOnOffBtn"><label for="EnableOnOffBtn">Enable On/Off switch</label></div>
+                    <p><label>Switch "off" background color:</label>
+                    <span>
+                        <select id="SliderOff" name="SliderOff" data-bind="value: settings.plugins.SerialCommunicator.Switch.SliderOff">
+                            <option value="#000000">Black</option>
+                            <option value="#FFFFFF">White</option>                            
+                            <option value="#0000FF">Blue</option>
+                            <option value="#FF0000">Red</option>
+                            <option value="#FFA500">Orange</option>
+                            <option value="#FFFF00">Yellow</option>
+                            <option value="#008000">Green</option>
+                            <option value="#800080">Purple</option>
+                        </select>
+                    </span></p>
+                    <p><label>Switch "on" background color:</label>
+                    <span>
+                        <select id="SliderOn" name="SliderOn" data-bind="value: settings.plugins.SerialCommunicator.Switch.SliderOn">
+                            <option value="#000000">Black</option>
+                            <option value="#FFFFFF">White</option>                            
+                            <option value="#0000FF">Blue</option>
+                            <option value="#FF0000">Red</option>
+                            <option value="#FFA500">Orange</option>
+                            <option value="#FFFF00">Yellow</option>
+                            <option value="#008000">Green</option>
+                            <option value="#800080">Purple</option>
+                        </select>
+                    </span></p>
+                    <p><label>Switch "off" icon:</label>
+                    <span>
+                        <input id="IconOffName" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.IconOff">
+                        <select id="ColorOff" name="ColorOff" data-bind="value: settings.plugins.SerialCommunicator.Switch.ColorOff">
+                            <option value="#000000">Black</option>
+                            <option value="#FFFFFF">White</option>                            
+                            <option value="#0000FF">Blue</option>
+                            <option value="#FF0000">Red</option>
+                            <option value="#FFA500">Orange</option>
+                            <option value="#FFFF00">Yellow</option>
+                            <option value="#008000">Green</option>
+                            <option value="#800080">Purple</option>
+                        </select>
+                    </span></p>
+                    <p><label>Switch "on" icon:</label>
+                    <span>
+                        <input id="IconOnName" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.IconOn">
+                        <select id="ColorOn" name="ColorOn" data-bind="value: settings.plugins.SerialCommunicator.Switch.ColorOn">
+                            <option value="#000000">Black</option>
+                            <option value="#FFFFFF">White</option>                            
+                            <option value="#0000FF">Blue</option>
+                            <option value="#FF0000">Red</option>
+                            <option value="#FFA500">Orange</option>
+                            <option value="#FFFF00">Yellow</option>
+                            <option value="#008000">Green</option>
+                            <option value="#800080">Purple</option>
+                        </select>
+                    </span></p>
+                    <p><label>Enter icons from <a href="https://coderthemes.com/uplon/layouts/vertical/icons-fontawesome.html" target="_blank">"Font Awesome".</a> 
                 </div>
             </div>
             <div id="gcode_commands" class="tab-pane">

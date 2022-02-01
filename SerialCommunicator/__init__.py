@@ -2,13 +2,18 @@
 from __future__ import absolute_import
 
 import calendar
+from distutils.log import error
+from logging import exception
 import time
 import octoprint.plugin
 import serial
 import serial.tools.list_ports
 from github import Github, RateLimitExceededException
 from octoprint.util import comm as comm
-import termios
+try:
+    import termios
+except ImportError:
+    {}
 
 
 class SerialCommunicatorPlugin(
@@ -24,18 +29,19 @@ class SerialCommunicatorPlugin(
         self._logger.info("SerialCommunicator")
 
     def get_api_commands(self):
-        self._logger.info(f"Manually triggered get_api.")
+        self._logger.debug(f"Manually triggered get_api.")
         return dict(Switched=["ip"])
 
     def on_api_command(self, command, data):
         if command == 'Switched':
             self._logger.debug(f"{data}")
             if 'True' in str(data):
-                self.SendSerialMessage("On")
-                self._logger.debug(f"Switched on!")                
+                self.SendSerialMessage("SwitchOn")
+                self._logger.debug(f"Switched on!")
             if 'False' in str(data):
-                self.SendSerialMessage("Off")
+                self.SendSerialMessage("SwitchOff")
                 self._logger.debug(f"Switched off!")
+    # ----------------------------------------------------------
 
     def get_settings_defaults(self):
         return {
@@ -130,9 +136,18 @@ class SerialCommunicatorPlugin(
                 "Examples": list(),
             },
             "Switch": {
+                "EnableOnOffBtn": True,
                 "Color": "",
                 "State": False,
-                "Icon": "",
+                "IconOn": "",
+                "IconOff": "",
+                "CurrentIcon": "",
+                "ColorOn": "",
+                "ColorOff": "",
+                "CurrentColor":"",
+                "SliderOff": "",
+                "SliderOn": "",
+                "CurrentSilder":"",
             }
         }
 
@@ -229,18 +244,21 @@ class SerialCommunicatorPlugin(
             objPort = str(item).split("#")[0]
             # if the hardware id is equal to the one saved under config.yaml (settings), send the message over serial.
             if hwID == self._settings.get(["connection", "selectedPort"]):
-                # self._logger.info(f"hwID: {hwID}, port: {objPort}")
+                self._logger.debug(f"hwID: {hwID}, port: {objPort}")
 
-                # uncomment for use with RPI
-                # Solution to open the port properly (bug in PySerial):
-                # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
-                # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
-                f = open(objPort)
-                attrs = termios.tcgetattr(f)
-                attrs[2] = attrs[2] & ~termios.HUPCL
-                termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
-                f.close()
-                # --------------------------------------------------------------------------------------------------
+                try:
+                    # Solution to open the port properly (bug in PySerial):
+                    # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
+                    # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
+                    f = open(objPort)
+                    attrs = termios.tcgetattr(f)
+                    attrs[2] = attrs[2] & ~termios.HUPCL
+                    termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
+                    f.close()
+                    # --------------------------------------------------------------------------------------------------
+                except exception:
+                    {}
+
                 ser = serial.Serial()
                 ser.port = objPort,
                 ser.baudrate = int(self._settings.get(
@@ -263,7 +281,7 @@ class SerialCommunicatorPlugin(
     def HandleGCODE(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         c = self._settings.get(['gcode', 'gcode_commands'])
         gcodeArray = str(c).split(";")
-        # self._logger.info(f"{cmd} Detected in {c}. {gcode} will be passed!.")
+
         if gcode in gcodeArray:
             if "VIRTUAL" in self._settings.get(["connection", "selectedPort"]):
                 self._logger.debug("No serial connection")
@@ -354,13 +372,18 @@ class SerialCommunicatorPlugin(
         c = self._settings.get(['Switch', 'State'])
         objresult = None
         if c == False:
-            self.SendSerialMessage("Light_On")
+            self.SendSerialMessage("SwitchOff")
             objresult = True
-            self._logger.debug("Light_on")
+            self._logger.debug("SwitchOff")
         if c == True:
-            self.SendSerialMessage("Light_Off")
+            self.SendSerialMessage("SwitchOn")
             objresult = False
-            self._logger.debug("Light_off")
+            self._logger.debug("SwitchOn")
+
+    def SetColors(self):
+        {
+            
+        }
 
     def on_settings_load(self):
         data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
