@@ -18,7 +18,7 @@ plugin_version = "0.1.3"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
-plugin_description = """a plugin to communicate throug a serial connection with a controller board."""
+plugin_description = "a plugin to communicate over a serial connection with a controller board or other device."
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
 plugin_author = "A.P. Ebbers"
