@@ -133,8 +133,8 @@ class SerialCommunicatorPlugin(
                 "SlicingProfileDeleted": False,
                 "SettingsUpdated": False,
                 "PrinterProfileModified": False,
-                "Examples": list(),
             },
+            "Examples": list(),
             "Switch": {
                 "EnableOnOffBtn": True,
                 "Color": "",
@@ -350,6 +350,7 @@ class SerialCommunicatorPlugin(
                             self.SendSerialMessage(action_name)
                         self._logger.info(f"action line: {action_name} sent.")
 
+    # Catch octoprint events and send them over the serial connection.
     def on_event(self, event, payload):
         eventlist = {"Startup", "Shutdown", "ClientOpened", "ClientAuthed", "ClientClosed", "UserLoggedIn", "UserLoggedOut", "ConnectivityChanged", "Connecting", "Connected", "Disconnecting", "Disconnected", "Error", "PrinterStateChanged", "Upload", "FileAdded", "FileRemoved", "FolderAdded", "FolderRemoved", "UpdatedFiles", "MetadataAnalysisStarted", "MetadataAnalysisFinished", "FileSelected", "FileDeselected", "TransferStarted", "TransferDone", "PrintStarted", "PrintFailed", "PrintDone", "PrintCancelling",
                      "PrintCancelled", "PrintPaused", "PrintResumed", "PowerOn", "PowerOff", "Home", "ZChange", "Dwell", "Waiting", "Cooling", "Alert", "Conveyor", "Eject", "EStop", "FilamentChange", "ToolChange", "CommandSuppressed", "InvalidToolReported", "CaptureStart", "CaptureDone", "CaptureFailed", "MovieRendering", "MovieDone", "MovieFailed", "SlicingStarted", "SlicingDone", "SlicingCancelled", "SlicingFailed", "SlicingProfileAdded", "SlicingProfileModified", "SlicingProfileDeleted", "SettingsUpdated", "PrinterProfileModified"}
@@ -379,11 +380,6 @@ class SerialCommunicatorPlugin(
             self.SendSerialMessage("SwitchOn")
             objresult = False
             self._logger.debug("SwitchOn")
-
-    def SetColors(self):
-        {
-            
-        }
 
     def on_settings_load(self):
         data = octoprint.plugin.SettingsPlugin.on_settings_load(self)

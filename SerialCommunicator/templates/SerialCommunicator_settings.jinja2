@@ -38,59 +38,24 @@
                     <div class="checkbox"><input class="custom" type="checkbox" id="EnableOnOffBtn" data-bind="checked: settings.plugins.SerialCommunicator.Switch.EnableOnOffBtn"><label for="EnableOnOffBtn">Enable On/Off switch</label></div>
                     <p><label>Switch "off" background color:</label>
                     <span>
-                        <select id="SliderOff" name="SliderOff" data-bind="value: settings.plugins.SerialCommunicator.Switch.SliderOff">
-                            <option value="#000000">Black</option>
-                            <option value="#FFFFFF">White</option>                            
-                            <option value="#0000FF">Blue</option>
-                            <option value="#FF0000">Red</option>
-                            <option value="#FFA500">Orange</option>
-                            <option value="#FFFF00">Yellow</option>
-                            <option value="#008000">Green</option>
-                            <option value="#800080">Purple</option>
-                        </select>
+                        <input list="Colors_1" id="SliderOff" name="SliderOff" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.SliderOff">
                     </span></p>
                     <p><label>Switch "on" background color:</label>
                     <span>
-                        <select id="SliderOn" name="SliderOn" data-bind="value: settings.plugins.SerialCommunicator.Switch.SliderOn">
-                            <option value="#000000">Black</option>
-                            <option value="#FFFFFF">White</option>                            
-                            <option value="#0000FF">Blue</option>
-                            <option value="#FF0000">Red</option>
-                            <option value="#FFA500">Orange</option>
-                            <option value="#FFFF00">Yellow</option>
-                            <option value="#008000">Green</option>
-                            <option value="#800080">Purple</option>
-                        </select>
+                        <input list="Colors_1" id="SliderOn" name="SliderOn" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.SliderOn">
                     </span></p>
                     <p><label>Switch "off" icon:</label>
                     <span>
                         <input id="IconOffName" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.IconOff">
-                        <select id="ColorOff" name="ColorOff" data-bind="value: settings.plugins.SerialCommunicator.Switch.ColorOff">
-                            <option value="#000000">Black</option>
-                            <option value="#FFFFFF">White</option>                            
-                            <option value="#0000FF">Blue</option>
-                            <option value="#FF0000">Red</option>
-                            <option value="#FFA500">Orange</option>
-                            <option value="#FFFF00">Yellow</option>
-                            <option value="#008000">Green</option>
-                            <option value="#800080">Purple</option>
-                        </select>
+                        <input list="Colors_1" id="ColorOff" name="ColorOff" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.ColorOff">
                     </span></p>
                     <p><label>Switch "on" icon:</label>
                     <span>
                         <input id="IconOnName" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.IconOn">
-                        <select id="ColorOn" name="ColorOn" data-bind="value: settings.plugins.SerialCommunicator.Switch.ColorOn">
-                            <option value="#000000">Black</option>
-                            <option value="#FFFFFF">White</option>                            
-                            <option value="#0000FF">Blue</option>
-                            <option value="#FF0000">Red</option>
-                            <option value="#FFA500">Orange</option>
-                            <option value="#FFFF00">Yellow</option>
-                            <option value="#008000">Green</option>
-                            <option value="#800080">Purple</option>
-                        </select>
+                        <input list="Colors_1" id="ColorOn" name="ColorOn" type="text" data-bind="value: settings.plugins.SerialCommunicator.Switch.ColorOn">
                     </span></p>
-                    <p><label>Enter icons from <a href="https://coderthemes.com/uplon/layouts/vertical/icons-fontawesome.html" target="_blank">"Font Awesome".</a> 
+                    <p><label>Enter icons from <a href="https://coderthemes.com/uplon/layouts/vertical/icons-fontawesome.html" target="_blank">"Font Awesome".</a>
+                    <p><label>You can select a color from the dropdown lists or enter your own color code. For a list of possible colors see <a><a href="https://www.rapidtables.com/web/color/RGB_Color.html" target="_blank">here.</a>
                 </div>
             </div>
             <div id="gcode_commands" class="tab-pane">
@@ -319,11 +284,11 @@
             </div>
              <div id="Printer_respones" class="tab-pane">
                 <div><label class="">Separate words or set of words with ";". (For example: wait;Not SD printing;etc)</label></div>
-                <div><input id="Printer_respones" type="text" class="input-mini text-left" style="width:400px" placeholder="Enter one of more words here...." data-bind="value: settings.plugins.SerialCommunicator.returned_lines.string"></div>
+                <div><input id="Printer_respones" type="text" class="input-mini text-left" style="width:400px" placeholder="Enter one of more words here...." data-bind="click: settings.plugins.SerialCommunicator.returned_lines.string"></div>
                 <p><label><br>Click <a href="https://docs.octoprint.org/en/master/plugins/hooks.html#octoprint-comm-protocol-gcode-received" target="_blank">here</a> for more information about returned lines.</label></p>
             </div>
             <div id="examples" class="tab-pane">
-                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto">
+                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto" data-bind="value: settings.plugins.SerialCommunicator.Examples">
                     <thead>
                         <tr>
                             <th><b>Links</b></th>
@@ -345,3 +310,15 @@
         </div>
     </div>
 </form>
+
+<datalist id="Colors_1">
+    <option value="#000000">Black</option>
+    <option value="#FFFFFF">White</option>                            
+    <option value="#0000FF">Blue</option>
+    <option value="#FF0000">Red</option>
+    <option value="#FFA500">Orange</option>
+    <option value="#FFFF00">Yellow</option>
+    <option value="#008000">Green</option>
+    <option value="#800080">Purple</option>
+    <option value="inherit">System</option>
+</datalist>
