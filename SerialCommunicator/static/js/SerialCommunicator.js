@@ -9,19 +9,12 @@ $(function () {
         var self = this;
 
         self.settings = parameters[0];
-        
-        self.onBeforeBinding = function() {
-            // Run these functions before binding to set the correct settings at startup.
-            self.switchLED();
-            self.EnableSwitch();
-        }
 
         self.EnableSwitch = function() {
-            SwitchStatus = self.settings.settings.plugins.SerialCommunicator.Switch.EnableOnOffBtn();
-            if (SwitchStatus == false) {
+            if (self.settings.settings.plugins.SerialCommunicator.Switch.EnableOnOffBtn() == false) {
                 document.getElementById("swicth_container").remove();
             }
-        }
+        };
 
         self.switchLED = function () {
             document = self;
@@ -38,7 +31,7 @@ $(function () {
             if (ColorOn == "") ColorOn = "color:black";
             ColorOff = self.settings.settings.plugins.SerialCommunicator.Switch.ColorOff();
             if (ColorOff == "") ColorOff = "color:black";
-
+                 
             // Get the switch background color. If no color is defined in settings, set the default.
             SwitchColorOn = self.settings.settings.plugins.SerialCommunicator.Switch.SliderOn();
             if (SwitchColorOn == "") SwitchColorOn = "color:black";
@@ -59,17 +52,46 @@ $(function () {
 
             // Pass the state of the checkbox to _init_.py -> simpleApiCommand
             OctoPrint.simpleApiCommand("SerialCommunicator", "Switched", { "ip": checkbox.checked });
-            // Save the state of the checkbox to settings.
-            self.settings.settings.plugins.SerialCommunicator.Switch.State(checkbox.checked);
 
             return true; //Thus must be true. Otherwise you need to click extra, and the function will get out of sink with the toggle button.
         };
-    };
 
+        // self.getExamplesJS = function () {
+        //     // const url = `https://api.github.com/repos/${user}/${repo}/git/trees/master`;
+        //     // const list = await fetch(url).then(res => res.json());
+        //     // const dir = list.tree.find(node => node.path === directory);
+        //     // if (dir) {
+        //     //     const list = await fetch(dir.url).then(res => res.json());
+        //     //     return list.tree.map(node => node.path);
+        //     // }
+        //     // const list = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+        //     //     owner: 'APEbbers',
+        //     //     repo: 'SerialCommunicator',
+        //     //     path: 'Examples'
+        //     // });
+        //     // const dir = list.tree.find(node => node.path === directory);
+        //     OctoPrint.simpleApiCommand("SerialCommunicator", "ExamplesJS", { "ip": "test"})
+        //     // if (dir) {
+        //     //     const list = await fetch(dir.url).then(res => res.json());
+                
+        //     //     // OctoPrint.simpleApiCommand("SerialCommunicator", "ExamplesJS", { "ip": list.tree.map(node => node.path) });
+        //     //     OctoPrint.simpleApiCommand("SerialCommunicator", "ExamplesJS", { "ip": "test"})
+        //     //     //self.settings.settings.plugins.SerialCommunicator.Examples(list.tree.map(node => node.path))
+        //     //     // return list.tree.map(node => node.path);
+        //     // };
+        // };
+
+        self.onBeforeBinding = function() {     
+            // Run these functions before binding to set the correct settings at startup.
+            self.switchLED();
+            self.EnableSwitch();
+            // self.ExampleSettings(self.settings.settings.plugins.SerialCommunicator.Examples());
+        }
+    };
     ADDITIONAL_VIEWMODELS.push({
         construct: SerialCommunicatorViewModel,
         dependencies: ["settingsViewModel", "navigationViewModel"],
-        elements: ["#navbar_plugin_SerialCommunicator"],
+        elements: ["#navbar_plugin_SerialCommunicator", "#settings_plugin_SerialCommunicator"],
     });
 });
 

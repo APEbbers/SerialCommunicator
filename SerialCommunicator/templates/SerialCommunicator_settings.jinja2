@@ -284,11 +284,12 @@
             </div>
              <div id="Printer_respones" class="tab-pane">
                 <div><label class="">Separate words or set of words with ";". (For example: wait;Not SD printing;etc)</label></div>
-                <div><input id="Printer_respones" type="text" class="input-mini text-left" style="width:400px" placeholder="Enter one of more words here...." data-bind="click: settings.plugins.SerialCommunicator.returned_lines.string"></div>
+                <div><input id="Printer_respones" type="text" class="input-mini text-left" style="width:400px" placeholder="Enter one of more words here...." data-bind="value: settings.plugins.SerialCommunicator.returned_lines.string"></div>
                 <p><label><br>Click <a href="https://docs.octoprint.org/en/master/plugins/hooks.html#octoprint-comm-protocol-gcode-received" target="_blank">here</a> for more information about returned lines.</label></p>
             </div>
             <div id="examples" class="tab-pane">
-                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto" data-bind="value: settings.plugins.SerialCommunicator.Examples">
+                {# <div><input id="ExampleReload" type="button" data-bind="click: settings.plugins.SerialCommunicator.Examples" value="Refresh"></div> #}
+                <table id="table_examples" class="table table-bordered table-hover table-condensed mx-left w-auto">
                     <thead>
                         <tr>
                             <th><b>Links</b></th>
@@ -296,12 +297,14 @@
                     </thead>
                     <tbody>
                         <colgroup>
-                            <col span="0" style="width:600px", >
+                            <col span="0" style="width:600px">
                         </colgroup>
+                        {% set i = 0 %}
                         {% for x in plugin_SerialCommunicator_Examples %}
                             {% set List1 = x.split('#') %}
+                            {% set i = i+1 %}
                             <tr>
-                                <td><label><a href={{List1[0]}} target="_blank">{{List1[1]}}</a></label></td>
+                                <td><label data-bind="settings.plugins.SerialCommunicator.Examples"><a href={{List1[0]}} target="_blank">{{List1[1]}}</a></label></td>
                             </tr>
                         {% endfor %}
                     </tbody>

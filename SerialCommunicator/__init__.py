@@ -1,10 +1,11 @@
 # coding=utf-8
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import calendar
-from distutils.log import error
+from email.mime import application
 from logging import exception
 import time
+from typing import List
 import octoprint.plugin
 import serial
 import serial.tools.list_ports
@@ -13,8 +14,7 @@ from octoprint.util import comm as comm
 try:
     import termios
 except ImportError:
-    {}
-
+    print("import failed")
 
 class SerialCommunicatorPlugin(
         octoprint.plugin.StartupPlugin,
@@ -24,10 +24,10 @@ class SerialCommunicatorPlugin(
         octoprint.plugin.SimpleApiPlugin,
         octoprint.plugin.SettingsPlugin):
 
-    # Simple API plugin
     def on_after_startup(self):
         self._logger.info("SerialCommunicator")
 
+    # Simple API plugin
     def get_api_commands(self):
         self._logger.debug(f"Manually triggered get_api.")
         return dict(Switched=["ip"])
@@ -41,6 +41,8 @@ class SerialCommunicatorPlugin(
             if 'False' in str(data):
                 self.SendSerialMessage("SwitchOff")
                 self._logger.debug(f"Switched off!")
+        # elif command == 'ExamplesJS':
+        #     self._logger.debug(f"{data}")
     # ----------------------------------------------------------
 
     def get_settings_defaults(self):
@@ -134,20 +136,20 @@ class SerialCommunicatorPlugin(
                 "SettingsUpdated": False,
                 "PrinterProfileModified": False,
             },
-            "Examples": list(),
+            "Examples": {},
             "Switch": {
                 "EnableOnOffBtn": True,
                 "Color": "",
-                "State": False,
+                "State": True,
                 "IconOn": "",
                 "IconOff": "",
                 "CurrentIcon": "",
                 "ColorOn": "",
                 "ColorOff": "",
-                "CurrentColor":"",
+                "CurrentColor": "",
                 "SliderOff": "",
                 "SliderOn": "",
-                "CurrentSilder":"",
+                "CurrentSlider": "",
             }
         }
 
@@ -165,6 +167,7 @@ class SerialCommunicatorPlugin(
 
     def get_template_vars(self):
         return dict(selectedPort=self.getPorts(), Examples=self.getExamples())
+        # return dict(selectedPort=self.getPorts())
 
     # Get the ports for the jinja2 template
     def getPorts(self):
@@ -191,6 +194,7 @@ class SerialCommunicatorPlugin(
     # get example sketches for a arduino board from a github repository.
     def getExamples(self):
         LinkArray = []
+        self._logger.debug("Get examples reached!")
         try:
             g = Github()
             repo = g.get_repo("APEbbers/SerialCommunicator")
@@ -215,7 +219,7 @@ class SerialCommunicatorPlugin(
             self._logger.info(
                 f"Too many requests to the GitHub repository! Please retry over {sleep_time}")
             LinkArray.append(
-                f'https://github.com/#Too many requests to the GitHub repository! Please refresh over {sleep_time} seconds')
+                f'https://github.com/#Too many requests to the GitHub repository! Please refresh over {sleep_time} seconds')            
         return LinkArray
 
     def on_settings_save(self, data):
@@ -230,22 +234,21 @@ class SerialCommunicatorPlugin(
         self._logger.debug(f"{message} recieved in handler.")
 
         ports = serial.tools.list_ports.comports()  # get al the active ports
-        for objPort, objDesc, objHWid, in sorted(ports):
+        for port, desc, hwid, in sorted(ports):
+            try:
+                StringA = str(hwid)
+                hwID = StringA[:StringA.index("LOCATION")-1]
+            except Exception:
+                hwID = hwid
             # If the port is not equal to the connection between octoprint and the printer, add it to the list.
-            if objPort != PrinterConnection[1]:
-                try:
-                    StringA = str(objHWid)
-                    hwID = StringA[:StringA.index("LOCATION")-1]
-                except Exception:
-                    hwID = objHWid
-                result.append("{}#{}#[{}]".format(objPort, objDesc, hwID))
+            if port != PrinterConnection[1]:
+                result.append("{}#{}#[{}]".format(port, desc, hwID))
+        ports.clear()
         for item in result:
-            hwID = str(item).split("#")[2]
+            objHWid = str(item).split("#")[2]
             objPort = str(item).split("#")[0]
             # if the hardware id is equal to the one saved under config.yaml (settings), send the message over serial.
-            if hwID == self._settings.get(["connection", "selectedPort"]):
-                self._logger.debug(f"hwID: {hwID}, port: {objPort}")
-
+            if objHWid == self._settings.get(["connection", "selectedPort"]):
                 try:
                     # Solution to open the port properly (bug in PySerial):
                     # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
@@ -257,12 +260,15 @@ class SerialCommunicatorPlugin(
                     f.close()
                     # --------------------------------------------------------------------------------------------------
                 except exception:
-                    {}
+                    self._logger.debug(f"{exception} recieved.")
 
+                objPort = str(item).split("#")[0]
                 ser = serial.Serial()
-                ser.port = objPort,
+                ser.port = objPort
                 ser.baudrate = int(self._settings.get(
-                    ["connection", "selectedBaudrate"])),
+                    ["connection", "selectedBaudrate"]))
+
+                self._logger.debug(f"hwID: {objHWid}, port: {objPort}")
                 try:
                     ser.open()
                 except serial.SerialException:
