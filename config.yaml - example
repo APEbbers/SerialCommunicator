@@ -1,0 +1,749 @@
+accessControl:
+  salt: fBqS133Auf4aLvlv6Qhozouun7vS2B02
+api:
+  allowCrossOrigin: true
+  key: 394547ED823443DEB5C70DCCEB49F8BD
+appearance:
+  color: black
+  components:
+    order:
+      navbar:
+      - plugin_prettygcode
+      - plugin_logging
+      - plugin_DisplayLayerProgress
+      - settings
+      - plugin_action_command_prompt
+      - plugin_announcements
+      - plugin_pi_support
+      - login
+      - systemmenu
+      sidebar:
+      - plugin_webcamSB
+      - plugin_filamentmanager
+      - state
+      - plugin_printer_safety_check
+      - files
+      - connection
+      tab:
+      - control
+      - terminal
+      - plugin_dashboard
+      - plugin_bedlevelvisualizer
+      - plugin_filemanager
+      - plugin_gcodeviewer
+      - plugin_SlicerSettingsTab
+      - temperature
+  defaultLanguage: en
+  name: Ender 3 Pro
+controls:
+- children:
+  - commands:
+    - G90
+    - G0 F1000 Z100
+    - G0 F1000 Y200 X100
+    - M17 Z
+    name: Eject Bed
+  - commands:
+    - G91
+    - G0 F100 Z20
+    - G90
+    - G28
+    - G0 F1000 X0 Y0
+    - G0 F100 Z0
+    name: Auto Home All
+  - commands:
+    - M17 Z
+    name: Lock Z
+  - commands:
+    - M17
+    name: Lock XYZ
+  - commands:
+    - M18
+    name: Unlock XYZ
+  - commands:
+    - G90
+    - G0 F1000 Z0
+    - G0 F1000 Y0 X0
+    name: Move to zero
+  - commands:
+    - M109 S225 T0
+    - M701 T0
+    name: Load filament E1
+  - commands:
+    - M109 S225 T0
+    - M702 T0
+    name: Unload filament E1
+  - commands:
+    - M109 S225 T1
+    - M701 T1 U600
+    name: Load filament E2
+  - commands:
+    - M109 S225 T1
+    - M702 T1 U600
+    name: Unload filament E2
+  - commands:
+    - M106 P0
+    name: Enable fan 1
+  - commands:
+    - M107 P0
+    name: Disable fan 1
+  - commands:
+    - M106 P1
+    name: Enable fan 2
+  - commands:
+    - M107 P1
+    name: Disable fan 2
+  layout: horizontal
+  name: Extra motion controls
+- children:
+  - command: M104 S225 T0
+    name: PETG - Set tool E1
+  - command: M104 S225 T1
+    name: PETG - Set tool E2
+  - command: M140 S70
+    name: PETG - Set bed
+  - command: M104 S210 T0
+    name: PLA - Set tool E1
+  - command: M104 S210 T1
+    name: PLA - Set tool E2
+  - command: M140 S40
+    name: PLA - Set bed
+  - commands:
+    - M140 S0
+    - M104 S0 T0
+    - M104 S0 T1
+    name: Turn off
+  layout: horizontal
+  name: 'Set temperatures '
+- children:
+  - commands:
+    - M303 C8 E0 S225 U1
+    - M500
+    name: Tune E1
+  - commands:
+    - M303 C8 E1 S225 U1
+    - M500
+    name: Tune E2
+  - commands:
+    - M303 C8 E-1 S70 U1
+    - M500
+    name: Tune bed
+  layout: horizontal
+  name: Tune heaters
+events:
+  subscriptions:
+  - command: ''
+    debug: true
+    enabled: true
+    event: PrintStarted
+    type: system
+  - command: ''
+    debug: true
+    enabled: true
+    event: PrintPaused
+    type: system
+feature:
+  g90InfluencesExtruder: true
+  pollWatched: true
+  printStartConfirmation: true
+  sdSupport: false
+gcodeAnalysis:
+  runAt: always
+plugins:
+  BLTouch:
+    cmdProbeBed: 'M104 S225
+
+      M190 S70
+
+      G28             ; Home XYZ.
+
+      G29 P1        ; Do automated probing of the bed.
+
+      G29 P3 T     ; Smart Fill Repeat until all mesh points are filled in, Used to
+      fill unreachable points.
+
+      G29 S0        ; Save UBL mesh points to slot 0 (EEPROM).
+
+      G29 F 10.0  ; Set Fade Height for correction at 10.0 mm.
+
+      G29 A          ; Activate the UBL System.
+
+      M500           ; Save current setup. WARNING - UBL will be active at power up,
+      before any G28.
+
+      M524
+
+      M104 S0
+
+      M140 S0'
+  DisplayLayerProgress:
+    browserTitleMessagePattern: '[progress]% end: [estimated_end_time], H=[current_height]/
+      [total_height]'
+    debuggingEnabled: true
+    navBarMessagePattern: 'Progress: <span style=''display: inline-block;width:42px;''>[progress]%</span>
+
+      Layer: <span style=''display: inline-block;width:24px;''>[current_layer]</span>
+      of
+
+      <span style=''display: inline-block;width:24px;''>[total_layers]</span>
+
+      Height: <span style=''display: inline-block;width:42px;''>[current_height]</span>
+      of
+
+      <span style=''display: inline-block;width:42px;''>[total_height]</span>mm'
+    printerDisplayMessagePattern: '[progress]% L=[current_layer]/[total_layers] [estimated_end_time]'
+    showAllPrinterMessages: false
+  SerialCommunicator:
+    Switch:
+      ColorOff: inherit
+      ColorOn: '#FFA500'
+      IconOff: far fa-lightbulb
+      IconOn: fas fa-lightbulb
+      SliderOff: '#FF0000'
+      SliderOn: '#008000'
+    action:
+      action_any: 0%
+      action_notification: SKR PRO
+    connection:
+      selectedBaudrate: '9600'
+      selectedPort: '[USB VID:PID=1A86:7523]'
+    events:
+      PrintCancelled: true
+      PrintPaused: true
+    gcode:
+      gcode_commands: M500;M503
+    returned_lines:
+      string: wait
+  SlicerSettingsParser:
+    regexes:
+    - ^; (?P<key>[^,]*?) = (?P<val>.*)
+  _disabled:
+  - firmwareupdater
+  - psucontrol
+  - themeify
+  - statefulsidebar
+  - ws281x_led_status
+  active_filters_extended:
+    activeFilters:
+    - '(Send: (N\d+\s+)?M105)|(Recv:\s+(ok\s+((P|B|N)\d+\s+)*)?(B|T\d*):\d+)'
+    - '(Send: (N\d+\s+)?M105)|(Recv:\s+(ok\s+([PBN]\d+\s+)*)?([BCLPR]|T\d*):-?\d+)'
+    - 'Recv: S_XYZ:7'
+    - 'Recv: wait'
+    - 'Recv: (echo:\s*)?busy:\s*processing'
+    - 'Recv: S_XYZ:*'
+    - (Send:\s+(N\d+\s+)?M114)|(Recv:\s+(ok\s+)?X:[+-]?([0-9]*[.])?[0-9]+\s+Y:[+-]?([0-9]*[.])?[0-9]+\s+Z:[+-]?([0-9]*[.])?[0-9]+\s+E\d*:[+-]?([0-9]*[.])?[0-9]+).*
+    - '(Send: (N\d+\s+)?M27)|(Recv: SD printing byte)|(Recv: Not SD printing)'
+  announcements:
+    _config_version: 1
+    channels:
+      _blog:
+        read_until: 1643641200
+      _important:
+        read_until: 1521111600
+      _octopi:
+        read_until: 1611568800
+      _plugins:
+        read_until: 1643608800
+      _releases:
+        read_until: 1642677300
+    enabled_channels:
+    - _octopi
+    - _plugins
+    - _important
+    - _blog
+    - _releases
+  bedlevelvisualizer:
+    _config_version: 1
+    command: G29 T
+    debug_logging: true
+    graph_z_limits: -3,3
+    mesh_timestamp: 02/01/2022, 19:35:54
+    show_webcam: true
+    showdegree: true
+    stored_mesh:
+    - - '+0.221'
+      - '+0.135'
+      - '+0.049'
+      - '+0.091'
+      - '+0.134'
+    - - '+0.147'
+      - '+0.087'
+      - '+0.027'
+      - '+0.085'
+      - '+0.142'
+    - - '+0.074'
+      - '+0.040'
+      - '+0.006'
+      - '+0.079'
+      - '+0.151'
+    - - '+0.066'
+      - '+0.046'
+      - '+0.026'
+      - '+0.114'
+      - '+0.201'
+    - - '+0.059'
+      - '+0.052'
+      - '+0.046'
+      - '+0.149'
+      - '+0.251'
+    stored_mesh_x:
+    - -106
+    - -53
+    - 1
+    - 54
+    - 107
+    stored_mesh_y:
+    - -96
+    - -48
+    - 1
+    - 49
+    - 97
+    stored_mesh_z_height: 235
+    use_center_origin: true
+  costestimation:
+    _config_version: 3
+    costOfElectricity: '0.21'
+    costOfFilament: '30'
+    maintenanceCosts: '30'
+    useFilamentManager: false
+  dashboard:
+    _config_version: 2
+    clearOn_Feedrate: '2'
+    clearOn_Filament: '2'
+    clearOn_LayerGraph: '2'
+    clearOn_PrintThumbnail: '0'
+    clearOn_PrinterMessage: '2'
+    commandWidgetArray:
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    - command: ''
+      enabled: false
+      icon: command-icon.png
+      interval: 10
+      name: ''
+      type: text
+    dashboardOverlayFull: true
+    fsJobControlButtons: true
+    fullscreenUseThemeColors: true
+    hotendTempMax: '240'
+    showHeightProgress: true
+    showJobControlButtons: true
+    showLayerProgress: true
+    showPrinterMessage: true
+    showSensorInfo: true
+    showSystemInfo: true
+    showTempGaugeColors: true
+    targetTempDeviation: '5'
+  discovery:
+    publicPort: 80
+    upnpUuid: 908a0a52-9766-4098-8faa-44fb198e6fbc
+  errortracking:
+    enabled: true
+    unique_id: af5880a5-2342-407d-a315-b1f6de8e11b7
+  firmwareupdater:
+    avrdude_avrmcu: m1284p
+    avrdude_baudrate: ''
+    avrdude_path: /usr/bin/avrdude
+    avrdude_programmer: arduino
+    dfuprog_avrmcu: ''
+    flash_method: avrdude
+  gcodesystemcommands:
+    command_definitions:
+    - command: sudo shutdown -h now
+      id: '10'
+    - command: python3 /usr/local/bin/Shutdown_Printer_RPI.py
+      id: '20'
+    - command: ''
+      id: '1'
+    - command: ''
+      id: '2'
+    - command: ''
+      id: '3'
+  gcodeviewer:
+    _config_version: 1
+  m73progress:
+    progress_from_time: true
+  macro:
+    _config_version: 2
+    macros:
+    - active: true
+      dop: true
+      macro: OCTO20
+      name: Shutdown
+      type: info
+    - active: true
+      dop: true
+      macro: M108
+      name: Break and continue
+      type: warning
+    - active: true
+      dop: false
+      macro: M112
+      name: Emergency stop
+      type: danger
+  onedrive_backup:
+    folder:
+      id: 68D1A23B9A453310!383583
+      path: /Documents/3D%20Printing/Software/OctoPrint
+  prusaslicerthumbnails:
+    inline_thumbnail: true
+    inline_thumbnail_position_left: true
+    inline_thumbnail_scale_value: '25'
+    scale_inline_thumbnail: true
+  psucontrol:
+    GPIODevice: /dev/gpiochip0
+    _config_version: 4
+  shutdownprinter:
+    api_custom_GET: true
+    api_json_command: ''
+    gcode: OCTO20
+    temperatureTarget: false
+  softwareupdate:
+    _config_version: 9
+    checks:
+      octoprint:
+        prerelease: false
+        prerelease_channel: master
+      pip:
+        package: pip
+        pip: pip=={target_version}
+        type: pypi_release
+  statefulsidebar:
+    collapsed:
+    - '#files'
+    - '#sidebar_plugin_action_command_notification'
+  themeify:
+    customRules:
+    - enabled: true
+      rule: background-color
+      selector: .navbar-inner
+      value: '#004b97'
+    - enabled: true
+      rule: background-color
+      selector: .accordion
+      value: '#2f3136'
+    - enabled: true
+      rule: width
+      selector: .span8
+      value: 1100px
+    - enabled: true
+      rule: width
+      selector: .container
+      value: 1820px
+    - enabled: true
+      rule: background-color
+      selector: div.panel-heading
+      value: '#2f3136'
+    - enabled: true
+      rule: border
+      selector: div.panel-heading
+      value: '#ffffff'
+    - enabled: true
+      rule: border
+      selector: div.panel
+      value: 1px solid
+    - enabled: true
+      rule: background-color
+      selector: div.panel
+      value: '#2f3136'
+    - enabled: true
+      rule: height
+      selector: '#temperature-graph'
+      value: 400px
+    - enabled: true
+      rule: min-height
+      selector: '#term .terminal #terminal-output, #term .terminal #terminal-output-lowfi'
+      value: 560px
+    - enabled: true
+      rule: color
+      selector: .navbar-text
+      value: '#ffffff'
+    - enabled: true
+      rule: tab-color
+      selector: '.nav-tabs '
+      value: '#004b97'
+    - enabled: false
+      rule: width
+      selector: .row-fluid
+      value: 150%
+    - enabled: true
+      rule: width
+      selector: '#webcam_container'
+      value: 0%
+    - enabled: true
+      rule: width
+      selector: '#webcam_rotator'
+      value: 20%
+    - enabled: true
+      rule: min-height
+      selector: '#files > div > div.gcode_files > div.scroll-wrapper'
+      value: 800px !important
+    enabled: false
+  tracking:
+    enabled: true
+    unique_id: 7c27ddc6-af1f-41dc-bdb6-87b17abb2698
+  uicustomizer:
+    customCSS: ".btn-info {\n    color: #fff !Important;\n    text-shadow: 0 -1px\
+      \ 0 rgb(0 0 0 / 25%) !Important;\n    background-color: #49afcd !Important;\n\
+      \    background-image: -moz-linear-gradient(top,#5bc0de,#2f96b4) !Important;\n\
+      \    background-image: -webkit-gradient(linear,0 0,0 100%,from(#5bc0de),to(#2f96b4))\
+      \ !Important;\n    background-image: -webkit-linear-gradient(top,#5bc0de,#2f96b4)\
+      \ !Important;\n    background-image: -o-linear-gradient(top,#5bc0de,#2f96b4)\
+      \ !Important;\n    background-image: linear-gradient(to bottom,#5bc0de,#2f96b4)\
+      \ !Important;\n    background-repeat: repeat-x !Important;\n    border-color:\
+      \ #2f96b4 #2f96b4 #1f6377 !Important;\n    border-color: rgba(0,0,0,.1) rgba(0,0,0,.1)\
+      \ rgba(0,0,0,.25) !Important;\n    *background-color: #2f96b4 !Important;\n\
+      \    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !Important;\n\
+      } \n\n.btn-warning {\n    color: #fff;\n    text-shadow: 0 -1px 0 rgb(0 0 0\
+      \ / 25%) !Important;\n    background-color: #faa732 !Important;\n    background-image:\
+      \ -moz-linear-gradient(top,#fbb450,#f89406) !Important;\n    background-image:\
+      \ -webkit-gradient(linear,0 0,0 100%,from(#fbb450),to(#f89406)) !Important;\n\
+      \    background-image: -webkit-linear-gradient(top,#fbb450,#f89406) !Important;\n\
+      \    background-image: -o-linear-gradient(top,#fbb450,#f89406) !Important;\n\
+      \    background-image: linear-gradient(to bottom,#fbb450,#f89406) !Important;\n\
+      \    background-repeat: repeat-x !Important;\n    border-color: #f89406 #f89406\
+      \ #ad6704 !Important;\n    border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.25)\
+      \ !Important;\n    *background-color: #f89406 !Important;\n    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false)\
+      \ !Important;\n}\n\n.btn-danger {\n    color: #fff !Important;\n    text-shadow:\
+      \ 0 -1px 0 rgb(0 0 0 / 25%) !Important;\n    background-color: #da4f49 !Important;\n\
+      \    background-image: -moz-linear-gradient(top,#ee5f5b,#bd362f) !Important;\n\
+      \    background-image: -webkit-gradient(linear,0 0,0 100%,from(#ee5f5b),to(#bd362f))\
+      \ !Important;\n    background-image: -webkit-linear-gradient(top,#ee5f5b,#bd362f)\
+      \ !Important;\n    background-image: -o-linear-gradient(top,#ee5f5b,#bd362f)\
+      \ !Important;\n    background-image: linear-gradient(to bottom,#ee5f5b,#bd362f)\
+      \ !Important;\n    background-repeat: repeat-x !Important;\n    border-color:\
+      \ #bd362f #bd362f #802420 !Important;\n    border-color: rgba(0,0,0,.1) rgba(0,0,0,.1)\
+      \ rgba(0,0,0,.25) !Important;\n    *background-color: #e6e6e6 !Important;\n\
+      \    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !Important;\n\
+      }\n\n.input-append .add-on, .input-prepend .add-on {\n    display: inline-block;\n\
+      \    width: auto;\n    height: 20px;\n    min-width: 16px;\n    padding: 4px\
+      \ 5px;\n    font-size: 14px;\n    font-weight: normal;\n    line-height: 20px;\n\
+      \    text-align: center;\n    text-shadow: 0 1px 0 #fff;\n    background-color:\
+      \ rgb(255 255 255 / 15%);\n    border: none;\n}"
+    hideMainCam: true
+    mainTabs:
+    - - control_link
+      - true
+      - false
+      - fas fa-expand-arrows-alt
+      - textOnly
+      - '#000000'
+    - - term_link
+      - true
+      - false
+      - fas fa-terminal
+      - textOnly
+      - '#000000'
+    - - tab_plugin_dashboard_link
+      - true
+      - false
+      - false
+      - textOnly
+      - '#000000'
+    - - tab_plugin_bedlevelvisualizer_link
+      - true
+      - false
+      - false
+      - textOnly
+      - '#000000'
+    - - tab_plugin_filemanager_link
+      - true
+      - false
+      - false
+      - textOnly
+      - '#000000'
+    - - temp_link
+      - false
+      - false
+      - fas fa-thermometer-half
+      - textOnly
+      - '#000000'
+    - - gcode_link
+      - false
+      - false
+      - fab fa-codepen
+      - textOnly
+      - '#000000'
+    responsiveMode: false
+    rows:
+    - _00#connection_wrapper: true
+      _01#files_wrapper: true
+      _02#state_wrapper: true
+      _03#sidebar_plugin_firmware_check_warning_wrapper: true
+      _04#sidebar_plugin_firmware_check_info_wrapper: false
+      _05#sidebar_plugin_shutdownprinter_wrapper: true
+      _06#sidebar_plugin_macro_wrapper: true
+      _07#UICGcodeVWidget: false
+      _08#UICTempWidget: false
+    - _00div.UICmainTabs: true
+    - _00#UICWebCamWidget: true
+      _01#sidebar_plugin_action_command_notification_wrapper: true
+      _02#sidebar_plugin_sidebartempgraph_wrapper: true
+      _03#sidebar_plugin_status_line_wrapper: true
+    saveAccordions: true
+    theme: red-night
+    themeLocal: false
+    themeVersion: 0.2.9.5
+    topIconSort:
+    - navbar_plugin_DisplayLayerProgress
+    - navbar_plugin_action_command_prompt
+    - navbar_plugin_pi_support
+    - navbar_plugin_logging_seriallog
+    - navbar_plugin_logging_plugintimingslog
+    - navbar_plugin_SerialCommunicator
+    webcamzoomtype: full
+    widths:
+    - '2'
+    - '6'
+    - '3'
+  virtual_printer:
+    _config_version: 1
+  ws281x_led_status:
+    _config_version: 1
+    effects:
+      idle:
+        color: '#e0e382'
+        effect: Solid Color
+      printing:
+        color: '#e3e082'
+        enabled: true
+      progress_heatup:
+        tool_key: '1'
+      progress_print:
+        enabled: false
+      startup:
+        color: '#e3e082'
+        effect: Solid Color
+      success:
+        color: '#0dde14'
+        effect: Solid Color
+      torch:
+        toggle: true
+    lights_on: false
+    progress_temp_start: '18'
+    strip:
+      count: 2
+      type: WS2812_STRIP
+printerProfiles:
+  default: ender_3_pro_-_0.6mm
+serial:
+  autoconnect: true
+  baudrate: 115200
+  blacklistedBaudrates:
+  - 9600
+  logPositionOnCancel: true
+  maxCommunicationTimeouts:
+    long: 0
+    printing: 0
+  port: /dev/ttyACM0
+server:
+  allowFraming: true
+  commands:
+    serverRestartCommand: sudo service octoprint restart
+    systemRestartCommand: sudo shutdown -r now
+    systemShutdownCommand: sudo shutdown -h now
+  firstRun: false
+  onlineCheck:
+    enabled: true
+  pluginBlacklist:
+    enabled: false
+  secretKey: SLVbmRHMpEUJ6aEmZ0cFaCInjjbhIQYi
+  seenWizards:
+    bedlevelvisualizer: null
+    corewizard: 3
+    psucontrol: 1
+    tracking: null
+    ws281x_led_status: 1
+temperature:
+  cutoff: 5
+  profiles:
+  - bed: 55
+    chamber: null
+    extruder: 225
+    name: PETG
+  - bed: 40
+    chamber: null
+    extruder: 210
+    name: PLA
+  sendAutomatically: true
+terminalFilters:
+- name: Suppress temperature messages
+  regex: '(Send: (N\d+\s+)?M105)|(Recv:\s+(ok\s+([PBN]\d+\s+)*)?([BCLPR]|T\d*):-?\d+)'
+- name: Suppress SD status messages
+  regex: '(Send: (N\d+\s+)?M27)|(Recv: SD printing byte)|(Recv: Not SD printing)'
+- name: Suppress position messages
+  regex: (Send:\s+(N\d+\s+)?M114)|(Recv:\s+(ok\s+)?X:[+-]?([0-9]*[.])?[0-9]+\s+Y:[+-]?([0-9]*[.])?[0-9]+\s+Z:[+-]?([0-9]*[.])?[0-9]+\s+E\d*:[+-]?([0-9]*[.])?[0-9]+).*
+- name: Suppress wait responses
+  regex: 'Recv: wait'
+- name: Suppress processing responses
+  regex: 'Recv: (echo:\s*)?busy:\s*processing'
+- name: Suppress S_XYZ:*
+  regex: 'Recv: S_XYZ:*'
+webcam:
+  cacheBuster: true
+  ffmpeg: /usr/bin/ffmpeg
+  flipH: true
+  flipV: true
+  snapshot: http://127.0.0.1:8080/?action=snapshot
+  stream: /webcam/?action=stream
+  streamRatio: '4:3'
+  timelapseEnabled: false
+  watermark: false
