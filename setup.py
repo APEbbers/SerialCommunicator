@@ -35,7 +35,7 @@ plugin_url = "https://github.com/APEbbers/SerialCommunicator"
 plugin_license = "AGPLv3"
 
 # Any additional requirements besides OctoPrint should be listed here
-plugin_requires = ["PyGithub", "TermIO", "pyserial", "serialport"]
+plugin_requires = ["PyGithub", "TermIO", "pyserial"]
 
 # --------------------------------------------------------------------------------------------------------------------
 # More advanced options that you usually shouldn't have to touch follow after this point
