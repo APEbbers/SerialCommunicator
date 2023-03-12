@@ -1,5 +1,5 @@
 {
-    "python.defaultInterpreterPath": "venv3/Scripts/python",
+    "python.defaultInterpreterPath": "D:/OneDrive/Programming/Projects/OctoPrint/OctoPrint/venv3/Scripts/python",
     "python.formatting.provider": "black",
     "python.formatting.blackArgs": [
         "--config",
