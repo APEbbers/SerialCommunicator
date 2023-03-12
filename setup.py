@@ -5,6 +5,7 @@
 
 # The plugin's identifier, has to be unique
 from setuptools import setup
+
 plugin_identifier = "SerialCommunicator"
 
 # The plugin's python package, should be "octoprint_<plugin identifier>", has to be unique
@@ -15,7 +16,7 @@ plugin_package = "SerialCommunicator"
 plugin_name = "SerialCommunicator"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "0.1.4"
+plugin_version = "0.1.6"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module

@@ -1,9 +1,21 @@
 {
-    "pythonIndent.keepHangingBracketOnLine": true,
-    "pythonIndent.trimLinesWithOnlyWhitespace": true,
-    "python.testing.pytestArgs": [
-        "SerialCommunicator"
+    "python.defaultInterpreterPath": "venv3/Scripts/python",
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--config",
+        "black.toml"
     ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "editor.formatOnSave": true,
+    "python.sortImports.args": [
+        "--profile=black",
+    ],
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.analysis.typeCheckingMode": "off"
 }

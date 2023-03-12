@@ -1,20 +1,21 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 
 import calendar
-from email.mime import application
-from logging import exception
 import time
-from typing import List
+from logging import exception
+
 import octoprint.plugin
 import serial
 import serial.tools.list_ports
 from github import Github, RateLimitExceededException
 from octoprint.util import comm as comm
+
 try:
     import termios
 except ImportError:
     print("import failed")
+
 
 class SerialCommunicatorPlugin(
         octoprint.plugin.StartupPlugin,
@@ -24,12 +25,12 @@ class SerialCommunicatorPlugin(
         octoprint.plugin.SimpleApiPlugin,
         octoprint.plugin.SettingsPlugin):
 
+    # Simple API plugin
     def on_after_startup(self):
         self._logger.info("SerialCommunicator")
 
-    # Simple API plugin
     def get_api_commands(self):
-        self._logger.debug(f"Manually triggered get_api.")
+        self._logger.debug(f'{"Manually triggered get_api."}')
         return dict(Switched=["ip"])
 
     def on_api_command(self, command, data):
@@ -37,12 +38,10 @@ class SerialCommunicatorPlugin(
             self._logger.debug(f"{data}")
             if 'True' in str(data):
                 self.SendSerialMessage("SwitchOn")
-                self._logger.debug(f"Switched on!")
+                self._logger.debug(f'{"Switched on!"}')
             if 'False' in str(data):
                 self.SendSerialMessage("SwitchOff")
-                self._logger.debug(f"Switched off!")
-        # elif command == 'ExamplesJS':
-        #     self._logger.debug(f"{data}")
+                self._logger.debug(f'{"Switched off!"}')
     # ----------------------------------------------------------
 
     def get_settings_defaults(self):
@@ -136,11 +135,11 @@ class SerialCommunicatorPlugin(
                 "SettingsUpdated": False,
                 "PrinterProfileModified": False,
             },
-            "Examples": {},
+            "Examples": list(),
             "Switch": {
                 "EnableOnOffBtn": True,
                 "Color": "",
-                "State": True,
+                "State": False,
                 "IconOn": "",
                 "IconOff": "",
                 "CurrentIcon": "",
@@ -149,7 +148,7 @@ class SerialCommunicatorPlugin(
                 "CurrentColor": "",
                 "SliderOff": "",
                 "SliderOn": "",
-                "CurrentSlider": "",
+                "CurrentSilder": "",
             }
         }
 
@@ -167,7 +166,6 @@ class SerialCommunicatorPlugin(
 
     def get_template_vars(self):
         return dict(selectedPort=self.getPorts(), Examples=self.getExamples())
-        # return dict(selectedPort=self.getPorts())
 
     # Get the ports for the jinja2 template
     def getPorts(self):
@@ -179,7 +177,7 @@ class SerialCommunicatorPlugin(
         for port, desc, hwid, in sorted(ports):
             try:
                 StringA = str(hwid)
-                hwID = StringA[:StringA.index("LOCATION")-1]
+                hwID = StringA[:StringA.index("LOCATION") - 1]
             except Exception:
                 hwID = hwid
             # If the port is not equal to the connection between octoprint and the printer, add it to the list.
@@ -194,7 +192,6 @@ class SerialCommunicatorPlugin(
     # get example sketches for a arduino board from a github repository.
     def getExamples(self):
         LinkArray = []
-        self._logger.debug("Get examples reached!")
         try:
             g = Github()
             repo = g.get_repo("APEbbers/SerialCommunicator")
@@ -219,7 +216,7 @@ class SerialCommunicatorPlugin(
             self._logger.info(
                 f"Too many requests to the GitHub repository! Please retry over {sleep_time}")
             LinkArray.append(
-                f'https://github.com/#Too many requests to the GitHub repository! Please refresh over {sleep_time} seconds')            
+                f'https://github.com/#Too many requests to the GitHub repository! Please refresh over {sleep_time} seconds')
         return LinkArray
 
     def on_settings_save(self, data):
@@ -237,7 +234,7 @@ class SerialCommunicatorPlugin(
         for port, desc, hwid, in sorted(ports):
             try:
                 StringA = str(hwid)
-                hwID = StringA[:StringA.index("LOCATION")-1]
+                hwID = StringA[:StringA.index("LOCATION") - 1]
             except Exception:
                 hwID = hwid
             # If the port is not equal to the connection between octoprint and the printer, add it to the list.
@@ -260,7 +257,7 @@ class SerialCommunicatorPlugin(
                     f.close()
                     # --------------------------------------------------------------------------------------------------
                 except exception:
-                    self._logger.debug(f"{exception} recieved.")
+                    self._logger.debug(f"{exception} resieved.")
 
                 objPort = str(item).split("#")[0]
                 ser = serial.Serial()
@@ -276,10 +273,10 @@ class SerialCommunicatorPlugin(
                     ser.open()
                 ser.reset_input_buffer()
                 ser.write(str(message).encode('ascii'))
-                if ser.isOpen() == True:
+                if ser.isOpen() is True:
                     self._logger.debug(
                         f"{message} sent. port={ser.port}, baudrate={ser.baudrate}")
-                if ser.isOpen() == False:
+                if ser.isOpen() is False:
                     self._logger.debug(
                         f"Serial is closed! port={ser.port}, baudrate={ser.baudrate}")
                 ser.close()
@@ -311,7 +308,7 @@ class SerialCommunicatorPlugin(
     def HandleActionMessage(self, comm, line, action, name, params, *args, **kwargs):
         # self._logger.debug(f"action name: {name}, action message: {line} recieved bij OctoPrint")
 
-        action_any = "any;"+self._settings.get(['action', 'action_any'])
+        action_any = "any;" + self._settings.get(['action', 'action_any'])
         action_start = "start;" + \
             self._settings.get(['action', 'action_start'])
         action_cancel = "cancel;" + \
@@ -358,15 +355,20 @@ class SerialCommunicatorPlugin(
 
     # Catch octoprint events and send them over the serial connection.
     def on_event(self, event, payload):
-        eventlist = {"Startup", "Shutdown", "ClientOpened", "ClientAuthed", "ClientClosed", "UserLoggedIn", "UserLoggedOut", "ConnectivityChanged", "Connecting", "Connected", "Disconnecting", "Disconnected", "Error", "PrinterStateChanged", "Upload", "FileAdded", "FileRemoved", "FolderAdded", "FolderRemoved", "UpdatedFiles", "MetadataAnalysisStarted", "MetadataAnalysisFinished", "FileSelected", "FileDeselected", "TransferStarted", "TransferDone", "PrintStarted", "PrintFailed", "PrintDone", "PrintCancelling",
-                     "PrintCancelled", "PrintPaused", "PrintResumed", "PowerOn", "PowerOff", "Home", "ZChange", "Dwell", "Waiting", "Cooling", "Alert", "Conveyor", "Eject", "EStop", "FilamentChange", "ToolChange", "CommandSuppressed", "InvalidToolReported", "CaptureStart", "CaptureDone", "CaptureFailed", "MovieRendering", "MovieDone", "MovieFailed", "SlicingStarted", "SlicingDone", "SlicingCancelled", "SlicingFailed", "SlicingProfileAdded", "SlicingProfileModified", "SlicingProfileDeleted", "SettingsUpdated", "PrinterProfileModified"}
+        eventlist = {"Startup", "Shutdown", "ClientOpened", "ClientAuthed", "ClientClosed", "UserLoggedIn", "UserLoggedOut", "ConnectivityChanged", "Connecting", "Connected",
+                     "Disconnecting", "Disconnected", "Error", "PrinterStateChanged", "Upload", "FileAdded", "FileRemoved", "FolderAdded", "FolderRemoved", "UpdatedFiles",
+                     "MetadataAnalysisStarted", "MetadataAnalysisFinished", "FileSelected", "FileDeselected", "TransferStarted", "TransferDone", "PrintStarted", "PrintFailed",
+                     "PrintDone", "PrintCancelling", "PrintCancelled", "PrintPaused", "PrintResumed", "PowerOn", "PowerOff", "Home", "ZChange", "Dwell", "Waiting", "Cooling",
+                     "Alert", "Conveyor", "Eject", "EStop", "FilamentChange", "ToolChange", "CommandSuppressed", "InvalidToolReported", "CaptureStart", "CaptureDone",
+                     "CaptureFailed", "MovieRendering", "MovieDone", "MovieFailed", "SlicingStarted", "SlicingDone", "SlicingCancelled", "SlicingFailed", "SlicingProfileAdded",
+                     "SlicingProfileModified", "SlicingProfileDeleted", "SettingsUpdated", "PrinterProfileModified"}
 
         for eventname in eventlist:
             if self._settings.get(["events", eventname]):
                 eventParameter = self._settings.get(['events', eventname])
                 self._logger.debug(
                     f"eventname: {eventname}, event: {event}, eventParameter: {eventParameter}")
-                if eventname == event and eventParameter != False:
+                if eventname == event and eventParameter is not False:
                     self._logger.debug(f"event: {event}detected!")
 
                     if self._settings.get(["connection", "selectedPort"]) == "VIRTUAL":
@@ -378,11 +380,11 @@ class SerialCommunicatorPlugin(
     def LightSwitch(self):
         c = self._settings.get(['Switch', 'State'])
         objresult = None
-        if c == False:
+        if c is False:
             self.SendSerialMessage("SwitchOff")
             objresult = True
             self._logger.debug("SwitchOff")
-        if c == True:
+        if c is True:
             self.SendSerialMessage("SwitchOn")
             objresult = False
             self._logger.debug("SwitchOn")
