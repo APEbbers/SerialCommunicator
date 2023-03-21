@@ -16,7 +16,7 @@ plugin_package = "SerialCommunicator"
 plugin_name = "SerialCommunicator"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "0.1.3.3"
+plugin_version = "0.1.3.4"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
@@ -68,7 +68,7 @@ additional_setup_parameters = {}
 
 try:
     import octoprint_setuptools
-except:
+except Exception:
     print("Could not import OctoPrint's setuptools, are you sure you are running that under "
           "the same python installation that OctoPrint is installed under?")
     import sys
