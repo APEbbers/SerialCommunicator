@@ -1,10 +1,9 @@
 /*
  Name:		RGB_led_strip_OctoPrint.ino
- Created:	1/14/2022 8:55:02 PM
- Author:	SKIKK
+ Created:	21/03/2023
+ Author:	A.P. Ebbers
 */
 
-//#include <rp2040_pio.h>
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
 #include <Adafruit_NeoPixel.h>
@@ -13,13 +12,10 @@
 #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
 #define LED_PIN     13
-//#define NUM_LEDS    47
-#define NUM_LEDS    11
+#define NUM_LEDS    47  // Number of LEDs in strip
 String message = ""; // Declare the message outside any void. Otherwise the message cannot be increased with lines 25.
 
-const int buttonPin = 8;  // the number of the pushbutton pin
-int buttonState = 0;  // variable for reading the pushbutton status
-
+// ------------Define the LED strip based on above declarations--------------
 Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 // Argument 1 = Number of pixels in NeoPixel strip
 // Argument 2 = Arduino pin number (most are valid)
@@ -29,7 +25,11 @@ Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
-#define DELAYVAL 0
+#define DELAYVAL 0 // time to go from one LED to the other.
+
+// ------------For an push button attached to the arduino-------------------
+const int buttonPin = 8;  // the number of the pushbutton pin
+int buttonState = 0;  // variable for reading the pushbutton status
 
 
 // the setup function runs once when you press reset or power the board
