@@ -7,9 +7,14 @@
       "command": "{python D:/OneDrive/Programming/Projects/OctoPrint/OctoPrint/setup.py clean}"
     },
     {
+      "label": "copy plugin",
+      "type": "shell",
+      "command": "{D:/OneDrive/Programming/Projects/OctoPrint/SerialCommunicator/CopyPlugin.bat}"
+    },
+    {
       "label": "build docs",
       "type": "shell",
       "command": "sphinx-build -b html ./docs ./docs/_build"
-    }
+    },
   ]
 }

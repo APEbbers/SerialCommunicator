@@ -15,6 +15,7 @@ try:
     import termios
 except ImportError:
     print("import failed")
+import platform
 
 
 class SerialCommunicatorPlugin(
@@ -39,11 +40,11 @@ class SerialCommunicatorPlugin(
             if 'True' in str(data):
                 self.SendSerialMessage("SwitchOn")
                 self._logger.debug(f'{"Switched on!"}')
-                self.getPorts()
+                # self.getPorts()
             if 'False' in str(data):
                 self.SendSerialMessage("SwitchOff")
-                self.getPorts()
                 self._logger.debug(f'{"Switched off!"}')
+                # self.getPorts()
     # ----------------------------------------------------------
 
     def get_settings_defaults(self):
@@ -193,12 +194,15 @@ class SerialCommunicatorPlugin(
                     ["connection", "DeviceID"])).strip()  # add strip to remove hidden surroundong char and/or whitespace
 
                 self._logger.debug(
-                    f"The ID string is: {IDstring}, in settings: {IDSetting}, {IDstring in IDSetting}")
+                    f"The ID string is: {IDstring}, in settings: {IDSetting}, comparison result: {IDstring in IDSetting}")
 
                 # If the ID of the device is equal to the ID in settings, add the device to the list.
                 if IDstring in IDSetting:
                     self._logger.debug(f"{IDstring} is added to the port list")
                     result.append("{}#{}#[{}]".format(port, desc, hwID))
+                else:
+                    self._logger.debug(
+                        f"{IDstring} is not added to the port list")
         result.append("VIRTUAL")
         ports.clear()
 
@@ -239,18 +243,19 @@ class SerialCommunicatorPlugin(
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
     def ReadID(self, objPort, message):
-        # try:
-        #     # Solution to open the port properly (bug in PySerial):
-        #     # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
-        #     # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
-        #     f = open(Port)
-        #     attrs = termios.tcgetattr(f)
-        #     attrs[2] = attrs[2] & ~termios.HUPCL
-        #     termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
-        #     f.close()
-        #     # --------------------------------------------------------------------------------------------------
-        # except exception:
-        #     self._logger.debug(f"{exception} resieved.")
+        if platform.system() == 'Linux':
+            try:
+                # Solution to open the port properly (bug in PySerial):
+                # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
+                # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
+                f = open(objPort)
+                attrs = termios.tcgetattr(f)
+                attrs[2] = attrs[2] & ~termios.HUPCL
+                termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
+                f.close()
+                # --------------------------------------------------------------------------------------------------
+            except exception:
+                self._logger.debug(f"{exception} resieved.")
 
         try:
             ser = serial.Serial(objPort, int(self._settings.get(
@@ -276,17 +281,23 @@ class SerialCommunicatorPlugin(
                     joined_seq = ''.join(str(v) for v in seq)
 
                     if chr(c) == '\n':
-                        returnMessage = joined_seq
-                        seq = []
+                        tic = time.time()
+                        tout = 30
+                        while ((time.time() - tic) < tout):
+                            returnMessage = joined_seq
+                            seq = []
 
-                        count += 1
-                        if (count == 2):
+                            count += 1
+                            if (count == 2):
+                                ser.close()
+
+                                self._logger.debug(
+                                    f"{returnMessage} read. port={ser.port}, baudrate={ser.baudrate}, timer stopped at: {(time.time() - tic)} seconds")
+
+                                return returnMessage
+                        else:
+                            self._logger.debug(f"timeout after {tout} seconds")
                             ser.close()
-
-                            self._logger.debug(
-                                f"{returnMessage} read. port={ser.port}, baudrate={ser.baudrate}")
-
-                            return returnMessage
             ser.close()
         except serial.SerialTimeoutException as e:
             self._logger.debug("TimeOut exception!!")
@@ -323,23 +334,19 @@ class SerialCommunicatorPlugin(
             if objHWid == self._settings.get(["connection", "selectedPort"]):
                 objPort = str(item).split("#")[0]
 
-                # try:
-                #     # Solution to open the port properly (bug in PySerial):
-                #     # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
-                #     # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
-                #     f = open(objPort)
-                #     attrs = termios.tcgetattr(f)
-                #     attrs[2] = attrs[2] & ~termios.HUPCL
-                #     termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
-                #     f.close()
-                #     # --------------------------------------------------------------------------------------------------
-                # except exception:
-                #     self._logger.debug(f"{exception} resieved.")
-
-                # ser = serial.Serial()
-                # ser.port = objPort
-                # ser.baudrate = int(self._settings.get(
-                #     ["connection", "selectedBaudrate"]))
+            if platform.system() == 'Linux':
+                try:
+                    # Solution to open the port properly (bug in PySerial):
+                    # https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code/15479088#15479088
+                    # https://raspberrypi.stackexchange.com/questions/9695/disable-dtr-on-ttyusb0/31298#31298
+                    f = open(objPort)
+                    attrs = termios.tcgetattr(f)
+                    attrs[2] = attrs[2] & ~termios.HUPCL
+                    termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
+                    f.close()
+                    # --------------------------------------------------------------------------------------------------
+                except exception:
+                    self._logger.debug(f"{exception} resieved.")
 
                 ser = serial.Serial(objPort, int(self._settings.get(
                     ["connection", "selectedBaudrate"])), timeout=1)

@@ -1,0 +1,3 @@
+xcopy "D:\OneDrive\Programming\Projects\OctoPrint\SerialCommunicator\SerialCommunicator\__init__.py" "C:\Users\SKIKK\AppData\Local\Programs\Python\Python310\Lib\site-packages\SerialCommunicator\"
+xcopy "D:\OneDrive\Programming\Projects\OctoPrint\SerialCommunicator\SerialCommunicator\templates" "C:\Users\SKIKK\AppData\Local\Programs\Python\Python310\Lib\site-packages\SerialCommunicator\templates\"
+xcopy "D:\OneDrive\Programming\Projects\OctoPrint\SerialCommunicator\SerialCommunicator\static" "C:\Users\SKIKK\AppData\Local\Programs\Python\Python310\Lib\site-packages\SerialCommunicator\static\"
