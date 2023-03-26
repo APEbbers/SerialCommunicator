@@ -53,6 +53,7 @@ class SerialCommunicatorPlugin(
                 "selectedPort": "",
                 "selectedBaudrate": "9600",
                 "DeviceID": "Arduino #1",
+                "timeout": "15"
             },
             "gcode": {
                 "gcode_commands": "",
@@ -280,11 +281,13 @@ class SerialCommunicatorPlugin(
                     # Make a string from array
                     joined_seq = ''.join(str(v) for v in seq)
 
-                    if chr(c) == '\n':
-                        tic = time.time()
-                        tout = 30
-                        while ((time.time() - tic) < tout):
-                            returnMessage = joined_seq
+                    # set an tineout
+                    tic = time.time()
+                    tout = int(self._settings.get(["connection", "timeout"]))
+                    while ((time.time() - tic) < tout):
+                        if chr(c) == '\n':
+
+                            returnMessage = joined_seq  # create the message
                             seq = []
 
                             count += 1
@@ -294,10 +297,13 @@ class SerialCommunicatorPlugin(
                                 self._logger.debug(
                                     f"{returnMessage} read. port={ser.port}, baudrate={ser.baudrate}, timer stopped at: {(time.time() - tic)} seconds")
 
-                                return returnMessage
-                        else:
-                            self._logger.debug(f"timeout after {tout} seconds")
-                            ser.close()
+                                return returnMessage  # return the message
+                    else:
+                        self._logger.debug(f"timeout after {tout} seconds")
+                        count += 1
+                        if (count == 2):  # iafter 2 times, the code stops
+                            break
+                        continue
             ser.close()
         except serial.SerialTimeoutException as e:
             self._logger.debug("TimeOut exception!!")

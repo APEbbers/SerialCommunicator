@@ -38,6 +38,9 @@
                                 <h6>Device ID</h6>
                                 <input id="DeviceID" type="text"
                                         data-bind="value: settings.plugins.SerialCommunicator.connection.DeviceID">
+                                <label for="timeoutValue">timeout: <input id="DeviceID" type="number"
+                                                data-bind="value: settings.plugins.SerialCommunicator.connection.timeout"
+                                                min="0" max="60" style="width:25px;"><span> seconds</span></label>
                                 <h5><br>Navigation bar switch settings</h5>
                                 <div id=IconSettings>
                                         <div class="checkbox"><input class="custom" type="checkbox" id="EnableOnOffBtn"
